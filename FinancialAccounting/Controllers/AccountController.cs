@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -150,18 +151,17 @@ namespace FinancialAccounting.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser()
-                {
-                    Id = model.UserId.ToString(),
-                    UserName = model.UserName
-                };
 
-                var result = await UserManager.UpdateAsync(user);
-
-                if (result.Succeeded)
+                using (var context = new ApplicationDbContext())
                 {
-                    var context = new ApplicationDbContext();
                     var uId = model.UserId.ToString();
+
+                    var currentUser = context.Users.Single(u => u.Id == uId);
+
+                    currentUser.UserName = model.UserName;
+
+                    context.Entry(currentUser).State = EntityState.Modified;
+
                     var roles = context.Users
                                 .Where(u => u.Id == uId)
                                 .SelectMany(u => u.Roles)
@@ -169,14 +169,15 @@ namespace FinancialAccounting.Controllers
 
                     foreach (var role in roles)
                     {
-                        UserManager.RemoveFromRole(user.Id, role.Name);
+                        UserManager.RemoveFromRole(currentUser.Id, role.Name);
                     }
 
-                    UserManager.AddToRole(user.Id, model.Role.ToString());
-
-                    return RedirectToAction("ManageAccounts", "Account");
+                    context.SaveChanges();
+                    UserManager.AddToRole(currentUser.Id, model.Role.ToString());
                 }
-                
+
+                return RedirectToAction("ManageAccounts", "Account");
+
             }
 
             // If we got this far, something failed, redisplay form
