@@ -67,7 +67,8 @@ namespace FinancialAccounting.Controllers
         public ActionResult ManageAccounts()
         {
             var applicationDbContext = new ApplicationDbContext();
-            return View(applicationDbContext.Users.ToList());
+            var users = applicationDbContext.Users.ToList();
+            return View(users);
         }
 
         //
@@ -147,152 +148,39 @@ namespace FinancialAccounting.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Manage(ManageUserViewModel model)
         {
-            bool hasPassword = HasPassword();
-            ViewBag.HasLocalPassword = hasPassword;
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            if (hasPassword)
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                var user = new ApplicationUser()
                 {
-                    IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
-                    }
-                    else
-                    {
-                        AddErrors(result);
-                    }
-                }
-            }
-            else
-            {
-                // User does not have a password so remove any validation errors caused by a missing OldPassword field
-                ModelState state = ModelState["OldPassword"];
-                if (state != null)
-                {
-                    state.Errors.Clear();
-                }
+                    Id = model.UserId.ToString(),
+                    UserName = model.UserName
+                };
 
-                if (ModelState.IsValid)
+                var result = await UserManager.UpdateAsync(user);
+
+                if (result.Succeeded)
                 {
-                    IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
-                    if (result.Succeeded)
+                    var context = new ApplicationDbContext();
+                    var uId = model.UserId.ToString();
+                    var roles = context.Users
+                                .Where(u => u.Id == uId)
+                                .SelectMany(u => u.Roles)
+                                .Join(context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r);
+
+                    foreach (var role in roles)
                     {
-                        return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
+                        UserManager.RemoveFromRole(user.Id, role.Name);
                     }
-                    else
-                    {
-                        AddErrors(result);
-                    }
+
+                    UserManager.AddToRole(user.Id, model.Role.ToString());
+
+                    return RedirectToAction("ManageAccounts", "Account");
                 }
+                
             }
 
             // If we got this far, something failed, redisplay form
             return View();
-        }
-
-        //
-        // POST: /Account/ExternalLogin
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public ActionResult ExternalLogin(string provider, string returnUrl)
-        {
-            // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
-        }
-
-        //
-        // GET: /Account/ExternalLoginCallback
-        [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-        {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Sign in the user with this external login provider if the user already has a login
-            var user = await UserManager.FindAsync(loginInfo.Login);
-            if (user != null)
-            {
-                await SignInAsync(user, isPersistent: false);
-                return RedirectToLocal(returnUrl);
-            }
-            else
-            {
-                // If the user does not have an account, then prompt the user to create an account
-                ViewBag.ReturnUrl = returnUrl;
-                ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
-            }
-        }
-
-        //
-        // POST: /Account/LinkLogin
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult LinkLogin(string provider)
-        {
-            // Request a redirect to the external login provider to link a login for the current user
-            return new ChallengeResult(provider, Url.Action("LinkLoginCallback", "Account"), User.Identity.GetUserId());
-        }
-
-        //
-        // GET: /Account/LinkLoginCallback
-        public async Task<ActionResult> LinkLoginCallback()
-        {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(XsrfKey, User.Identity.GetUserId());
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-            }
-            var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("Manage");
-            }
-            return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-        }
-
-        //
-        // POST: /Account/ExternalLoginConfirmation
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Manage");
-            }
-
-            if (ModelState.IsValid)
-            {
-                // Get the information about the user from the external login provider
-                var info = await AuthenticationManager.GetExternalLoginInfoAsync();
-                if (info == null)
-                {
-                    return View("ExternalLoginFailure");
-                }
-                var user = new ApplicationUser() { UserName = model.UserName };
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await UserManager.AddLoginAsync(user.Id, info.Login);
-                    if (result.Succeeded)
-                    {
-                        await SignInAsync(user, isPersistent: false);
-                        return RedirectToLocal(returnUrl);
-                    }
-                }
-                AddErrors(result);
-            }
-
-            ViewBag.ReturnUrl = returnUrl;
-            return View(model);
         }
 
         //
@@ -303,14 +191,6 @@ namespace FinancialAccounting.Controllers
         {
             AuthenticationManager.SignOut();
             return RedirectToAction("Index", "Home");
-        }
-
-        //
-        // GET: /Account/ExternalLoginFailure
-        [AllowAnonymous]
-        public ActionResult ExternalLoginFailure()
-        {
-            return View();
         }
 
         [ChildActionOnly]
@@ -337,8 +217,6 @@ namespace FinancialAccounting.Controllers
 
         private ManageUserViewModel GenerateViewModel(Guid? userId, ApplicationUser user)
         {
-            var model = new ManageUserViewModel();
-
             var context = new ApplicationDbContext();
             var uId = userId.ToString();
             var roles = context.Users
@@ -349,9 +227,9 @@ namespace FinancialAccounting.Controllers
 
             var viewModel = new ManageUserViewModel
             {
-                Login = user.UserName,
-                Role = (UserRoles)Convert.ToInt32(roles.Id),
-                OldPassword = user.PasswordHash
+                UserId = userId,
+                UserName = user.UserName,
+                Role = (UserRoles)Convert.ToInt32(roles.Id)
             };
 
             return viewModel;

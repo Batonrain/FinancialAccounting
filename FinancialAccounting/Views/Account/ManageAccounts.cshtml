@@ -1,0 +1,22 @@
+﻿@using FinancialAccounting.Models
+@model List<ApplicationUser>
+
+@{
+    ViewBag.Title = "Управление пользователями";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Управление пользователями</h2>
+
+@UserList(Model)
+
+@helper UserList(IEnumerable<ApplicationUser> users)
+{
+    foreach (var b in users)
+    {
+        <div class="form-group">
+            @Html.ActionLink(b.UserName, "Manage", "Account", routeValues: new { @userId = b.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+        </div>
+    }
+}
+

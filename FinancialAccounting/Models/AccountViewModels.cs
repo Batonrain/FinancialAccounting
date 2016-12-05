@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using FinancialAccountingConstruction.DAL.Models.Users;
 
 namespace FinancialAccounting.Models
@@ -12,29 +13,31 @@ namespace FinancialAccounting.Models
 
     public class ManageUserViewModel
     {
+        public Guid? UserId { get;set; }
+
         [Required]
         [DataType(DataType.Text)]
         [Display(Name = "Имя пользователя")]
-        public string Login { get; set; }
+        public string UserName { get; set; }
 
         [Display(Name = "Выберите роль")]
         public UserRoles Role { get; set; }
 
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = "Текущий пароль")]
-        public string OldPassword { get; set; }
+        //[Required]
+        //[DataType(DataType.Password)]
+        //[Display(Name = "Текущий пароль")]
+        //public string OldPassword { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "{0} должен быть хотя бы {2} символов в длину.", MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = "Новый пароль")]
-        public string NewPassword { get; set; }
+        //[Required]
+        //[StringLength(100, ErrorMessage = "{0} должен быть хотя бы {2} символов в длину.", MinimumLength = 6)]
+        //[DataType(DataType.Password)]
+        //[Display(Name = "Новый пароль")]
+        //public string NewPassword { get; set; }
 
-        [DataType(DataType.Password)]
-        [Display(Name = "Подтверждение нового пароля")]
-        [Compare("NewPassword", ErrorMessage = "Поля 'Новый пароль' и 'Подтверждение нового пароля' должны совпадать.")]
-        public string ConfirmPassword { get; set; }
+        //[DataType(DataType.Password)]
+        //[Display(Name = "Подтверждение нового пароля")]
+        //[Compare("NewPassword", ErrorMessage = "Поля 'Новый пароль' и 'Подтверждение нового пароля' должны совпадать.")]
+        //public string ConfirmPassword { get; set; }
     }
 
     public class LoginViewModel
