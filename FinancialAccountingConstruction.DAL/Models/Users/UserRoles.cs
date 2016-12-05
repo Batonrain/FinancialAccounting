@@ -1,11 +1,10 @@
-﻿using System.ComponentModel;
-
-namespace FinancialAccountingConstruction.BusinessLogic.Models.Users
+﻿namespace FinancialAccountingConstruction.DAL.Models.Users
 {
     public enum UserRoles
     {
-        CashAccounting = 0,
-        NonCashAccounting = 1,
-        Admin = 2
+        Admin = 1,
+        ReadOnlyUser = 2,
+        CashAccounting = 3,
+        NonCashAccounting = 4
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
+using FinancialAccountingConstruction.DAL;
+using FinancialAccountingConstruction.DAL.Models.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
@@ -61,9 +63,15 @@ namespace FinancialAccounting.Controllers
             return View(model);
         }
 
+
+        public ActionResult ManageAccounts()
+        {
+            var applicationDbContext = new ApplicationDbContext();
+            return View(applicationDbContext.Users.ToList());
+        }
+
         //
         // GET: /Account/Register
-        [AllowAnonymous]
         public ActionResult Register()
         {
             return View();
@@ -72,7 +80,6 @@ namespace FinancialAccounting.Controllers
         //
         // POST: /Account/Register
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
@@ -84,7 +91,7 @@ namespace FinancialAccounting.Controllers
                 {
                     await UserManager.AddToRoleAsync(user.Id, model.Role.ToString());
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("ManageAccounts", "Account");
                 }
                 else
                 {
@@ -117,17 +124,21 @@ namespace FinancialAccounting.Controllers
 
         //
         // GET: /Account/Manage
-        public ActionResult Manage(ManageMessageId? message)
+        public ActionResult Manage(Guid? userId)
         {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : "";
-            ViewBag.HasLocalPassword = HasPassword();
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            return View();
+            if (userId != null)
+            {
+                var user = UserManager.FindById(userId.ToString());
+                var viewModel = GenerateViewModel(userId, user);
+
+                ViewBag.Title = string.Format("Пользователь {0}", user.UserName);
+                ViewBag.HasLocalPassword = HasPassword();
+                ViewBag.ReturnUrl = Url.Action("Manage");
+
+                return View(viewModel);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         //
@@ -178,7 +189,7 @@ namespace FinancialAccounting.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return View();
         }
 
         //
@@ -324,6 +335,28 @@ namespace FinancialAccounting.Controllers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
+        private ManageUserViewModel GenerateViewModel(Guid? userId, ApplicationUser user)
+        {
+            var model = new ManageUserViewModel();
+
+            var context = new ApplicationDbContext();
+            var uId = userId.ToString();
+            var roles = context.Users
+                                .Where(u => u.Id == uId)
+                                .SelectMany(u => u.Roles)
+                                .Join(context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r)
+                                .FirstOrDefault();
+
+            var viewModel = new ManageUserViewModel
+            {
+                Login = user.UserName,
+                Role = (UserRoles)Convert.ToInt32(roles.Id),
+                OldPassword = user.PasswordHash
+            };
+
+            return viewModel;
+        }
+
         private IAuthenticationManager AuthenticationManager
         {
             get
@@ -379,7 +412,8 @@ namespace FinancialAccounting.Controllers
 
         private class ChallengeResult : HttpUnauthorizedResult
         {
-            public ChallengeResult(string provider, string redirectUri) : this(provider, redirectUri, null)
+            public ChallengeResult(string provider, string redirectUri)
+                : this(provider, redirectUri, null)
             {
             }
 
