@@ -20,10 +20,14 @@
                 @Html.ActionLink("Учёт строительства", "Index", "Home", null, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Управление пользователями", "ManageAccounts", "Account")</li>
-                    <li>@Html.ActionLink("Создать объект", "About", "Home")</li>
-                </ul>
+                @if (Request.IsAuthenticated)
+                {
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("Управление пользователями", "ManageAccounts", "Account")</li>
+                        <li>@Html.ActionLink("Создать объект", "About", "Home")</li>
+                    </ul>
+                }
+
                 @Html.Partial("_LoginPartial")
             </div>
         </div>

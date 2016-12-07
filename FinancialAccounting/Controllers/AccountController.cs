@@ -144,6 +144,35 @@ namespace FinancialAccounting.Controllers
         }
 
         //
+        // GET: /Account/Manage
+        public ActionResult Remove(Guid? userId)
+        {
+            if (userId != null)
+            {
+                var uId = userId.ToString();
+                using (var context = new ApplicationDbContext())
+                {
+                    context.Users.Remove(context.Users.Single(user => user.Id == uId));
+                    var roles = context.Users
+                                 .Where(u => u.Id == uId)
+                                 .SelectMany(u => u.Roles)
+                                 .Join(context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r);
+
+                    foreach (var role in roles)
+                    {
+                        UserManager.RemoveFromRole(uId, role.Name);
+                    }
+
+                    context.SaveChanges();
+                }
+
+                ViewBag.ReturnUrl = Url.Action("Manage");
+            }
+
+            return RedirectToAction("ManageAccounts", "Account");
+        }
+
+        //
         // POST: /Account/Manage
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -213,9 +242,6 @@ namespace FinancialAccounting.Controllers
         }
 
         #region Helpers
-        // Used for XSRF protection when adding external logins
-        private const string XsrfKey = "XsrfId";
-
         private ManageUserViewModel GenerateViewModel(Guid? userId, ApplicationUser user)
         {
             var context = new ApplicationDbContext();
@@ -286,35 +312,6 @@ namespace FinancialAccounting.Controllers
             else
             {
                 return RedirectToAction("Index", "Home");
-            }
-        }
-
-        private class ChallengeResult : HttpUnauthorizedResult
-        {
-            public ChallengeResult(string provider, string redirectUri)
-                : this(provider, redirectUri, null)
-            {
-            }
-
-            public ChallengeResult(string provider, string redirectUri, string userId)
-            {
-                LoginProvider = provider;
-                RedirectUri = redirectUri;
-                UserId = userId;
-            }
-
-            public string LoginProvider { get; set; }
-            public string RedirectUri { get; set; }
-            public string UserId { get; set; }
-
-            public override void ExecuteResult(ControllerContext context)
-            {
-                var properties = new AuthenticationProperties() { RedirectUri = RedirectUri };
-                if (UserId != null)
-                {
-                    properties.Dictionary[XsrfKey] = UserId;
-                }
-                context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
             }
         }
         #endregion

@@ -6,7 +6,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Управление пользователями</h2>
+<h2 style="text-align:left;float:left;">Управление пользователями</h2>
+<h3 style="text-align:right;float:right;">@Html.ActionLink("Создать нового пользователя", "Register", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-primary" })</h3>
+<hr style="clear:both;" />
 
 @UserList(Model)
 
