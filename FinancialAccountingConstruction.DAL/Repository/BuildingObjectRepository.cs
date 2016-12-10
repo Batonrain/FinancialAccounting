@@ -6,10 +6,27 @@ namespace FinancialAccountingConstruction.DAL.Repository
 {
     public class BuildingObjectRepository 
     {
-        public List<BuildingObject> GetAllBuildingObjects()
+        private readonly FinancialAccountingDbContext _context;
+
+        public BuildingObjectRepository()
         {
-            var db = new FinancialAccountingDbContext();
-            return db.BuildingObjects.ToList();
+            _context = new FinancialAccountingDbContext();
+        }
+
+        public IEnumerable<BuildingObject> GetAllBuildingObjects()
+        {
+            return _context.BuildingObjects.ToList();
+        }
+
+        public void AddBuildingObject(BuildingObject buildingObject)
+        {
+            _context.BuildingObjects.Add(buildingObject);
+            _context.SaveChanges();
+        }
+
+        public BuildingObject GetObjectById(int id)
+        {
+            return _context.BuildingObjects.Single(obj => obj.Id == id);
         }
     }
 }

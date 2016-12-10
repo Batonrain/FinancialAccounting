@@ -68,7 +68,8 @@ namespace FinancialAccounting.Controllers
         public ActionResult ManageAccounts()
         {
             var applicationDbContext = new ApplicationDbContext();
-            var users = applicationDbContext.Users.ToList();
+            var currentUserId = User.Identity.GetUserId();
+            var users = applicationDbContext.Users.Where(us => us.Id != currentUserId).ToList();
             return View(users);
         }
 
@@ -124,24 +125,7 @@ namespace FinancialAccounting.Controllers
             return RedirectToAction("Manage", new { Message = message });
         }
 
-        //
-        // GET: /Account/Manage
-        public ActionResult Manage(Guid? userId)
-        {
-            if (userId != null)
-            {
-                var user = UserManager.FindById(userId.ToString());
-                var viewModel = GenerateViewModel(userId, user);
-
-                ViewBag.Title = string.Format("Пользователь {0}", user.UserName);
-                ViewBag.HasLocalPassword = HasPassword();
-                ViewBag.ReturnUrl = Url.Action("Manage");
-
-                return View(viewModel);
-            }
-
-            return RedirectToAction("Index", "Home");
-        }
+        
 
         //
         // GET: /Account/Manage
@@ -170,6 +154,25 @@ namespace FinancialAccounting.Controllers
             }
 
             return RedirectToAction("ManageAccounts", "Account");
+        }
+
+        //
+        // GET: /Account/Manage
+        public ActionResult Manage(Guid? userId)
+        {
+            if (userId != null)
+            {
+                var user = UserManager.FindById(userId.ToString());
+                var viewModel = GenerateViewModel(userId, user);
+
+                ViewBag.Title = string.Format("Пользователь {0}", user.UserName);
+                ViewBag.HasLocalPassword = HasPassword();
+                ViewBag.ReturnUrl = Url.Action("Manage");
+
+                return View(viewModel);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         //

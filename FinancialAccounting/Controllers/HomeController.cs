@@ -9,11 +9,17 @@ namespace FinancialAccounting.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly BuildingObjectRepository _buildingObjectRepository;
+
+        public HomeController()
+        {
+            _buildingObjectRepository = new BuildingObjectRepository();
+        }
+
         public ActionResult Index()
         {
-            var rr = new BuildingObjectRepository();
-            var er = rr.GetAllBuildingObjects();
-            return View(ToBuildingList(er));
+            var objects = _buildingObjectRepository.GetAllBuildingObjects();
+            return View(ToBuildingList(objects));
         }
 
         public ActionResult About()
