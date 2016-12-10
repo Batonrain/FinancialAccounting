@@ -1,7 +1,7 @@
 ﻿@using FinancialAccounting.Models.Biuldings
 @model ManageBuildingViewModel
 @{
-    ViewBag.Title = "Управление объектом";
+    ViewBag.Title = string.Format("Управление объектом '{0}'",  Model.BuildingMainInfo.Name);
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -9,7 +9,7 @@
     <div class="col-md-12">
         <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
         <h3 style="margin-left: 5px;text-align: right; float: right;">
-            @Html.ActionLink("Редактировать описание объекта", "Remove", "Account", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            @Html.ActionLink("Редактировать описание объекта", "UpdateObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
         <h3 style="margin-left:5px;text-align:right;float:right;">
             @Html.ActionLink("Создать подрядчика", "CreateContractorForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
@@ -19,34 +19,38 @@
 </div>
 
 <div class="row">
-    <table>
-        <tr>
-            <th>Название подрядчика</th>
-            <th>Наличные рассчёты</th>
-            <th>Безналичные рассчёты</th>
-            <th>Дата платежа</th>
-        </tr>
-        @foreach (var contractor in @Model.Contractors)
-        {
-            <tr style="border-collapse: separate; border-spacing: 0 5px;">
-                <td>
-                    @Html.ActionLink(contractor.Name, "Index", "Home", routeValues: new { @id = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
-                </td>
-                <td>
-                    Наличная сумма
-                </td>
-                <td>
-                    Безналичная сумма
-                </td>
-                <td>
-                    Статус даты платежа
-                </td>
-            </tr>
-        }
-    </table>
+    
 </div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
+    <div class="row">
+        <table>
+            <tr>
+                <th>Название подрядчика</th>
+                <th>Наличные рассчёты</th>
+                <th>Безналичные рассчёты</th>
+                <th>Дата платежа</th>
+            </tr>
+            @foreach (var contractor in @Model.Contractors)
+            {
+                <tr style="border-collapse: separate; border-spacing: 0 5px;">
+                    <td>
+                        @Html.ActionLink(contractor.Name, "Index", "Home", routeValues: new { @id = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                    </td>
+                    <td>
+                        Наличная сумма
+                    </td>
+                    <td>
+                        Безналичная сумма
+                    </td>
+                    <td>
+                        Статус даты платежа
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
 

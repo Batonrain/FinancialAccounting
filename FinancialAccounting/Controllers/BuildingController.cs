@@ -5,6 +5,7 @@ using FinancialAccounting.Models.Contractors;
 using FinancialAccountingConstruction.DAL.Models.Building;
 using FinancialAccountingConstruction.DAL.Models.Contractors;
 using FinancialAccountingConstruction.DAL.Repository;
+using Newtonsoft.Json.Schema;
 
 namespace FinancialAccounting.Controllers
 {
@@ -40,9 +41,53 @@ namespace FinancialAccounting.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        
+
         public ActionResult CreateObject()
         {
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateObject(BuildingViewModel buildingModel)
+        {
+            var buildingObject = new BuildingObject
+            {
+                Name = buildingModel.Name,
+                Notes = buildingModel.Description
+            };
+
+            _buildingObjectRepository.AddBuildingObject(buildingObject);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult UpdateObject(int buildingId)
+        {
+            var obj = _buildingObjectRepository.GetObjectById(buildingId);
+
+            var viewModel = ToBuildingViewModel(obj);
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateObject(BuildingViewModel buildingModel)
+        {
+            var obj = ToBuildingObjectModel(buildingModel);
+
+            _buildingObjectRepository.UpdateBuildingObject(obj);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult RemoveObject(int buildingId)
+        {
+            _buildingObjectRepository.RemoveBuildingObjectById(buildingId);
+
+            return RedirectToAction("Index", "Home");
         }
 
         public ActionResult CreateContractorForObject(int buildingId)
@@ -53,6 +98,11 @@ namespace FinancialAccounting.Controllers
             };
 
             return View(viewModel);
+        }
+        public ActionResult ContractorPayments(int contractorId)
+        {
+
+            return View();
         }
 
         [HttpPost]
@@ -69,21 +119,6 @@ namespace FinancialAccounting.Controllers
             return View(contractor);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult CreateObject(BuildingViewModel buildingModel)
-        {
-            var buildingObject = new BuildingObject()
-            {
-                Name = buildingModel.Name,
-                Notes = buildingModel.Description
-            };
-
-            _buildingObjectRepository.AddBuildingObject(buildingObject);
-
-            return RedirectToAction("Index");
-        }
-
         private BuildingViewModel ToBuildingViewModel(BuildingObject buildingObject)
         {
             return new BuildingViewModel
@@ -94,7 +129,7 @@ namespace FinancialAccounting.Controllers
             };
         }
 
-        private BuildingObject ToBuildingViewModel(BuildingViewModel buildingObject)
+        private BuildingObject ToBuildingObjectModel(BuildingViewModel buildingObject)
         {
             return new BuildingObject
             {

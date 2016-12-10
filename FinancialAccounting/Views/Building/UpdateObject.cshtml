@@ -1,0 +1,42 @@
+﻿@model FinancialAccounting.Models.Biuldings.BuildingViewModel
+
+@{
+    ViewBag.Title = string.Format("Редактирование объекта '{0}'", Model.Name);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
+        <h3 style="margin-left: 5px;text-align: right; float: right;">
+            @Html.ActionLink("Удалить объект", "RemoveObject", "Building", routeValues: new { @buildingId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+        </h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("UpdateObject", "Building", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary()
+            @Html.HiddenFor(m => m.Id)
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Сохранить объект" class="btn btn-default" />
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -24,9 +24,25 @@ namespace FinancialAccountingConstruction.DAL.Repository
             _context.SaveChanges();
         }
 
+        public void UpdateBuildingObject(BuildingObject buildingObject)
+        {
+            _context.BuildingObjects.Attach(buildingObject);
+            var entry = _context.Entry(buildingObject);
+            entry.Property(e => e.Name).IsModified = true;
+            entry.Property(e => e.Notes).IsModified = true;
+            _context.SaveChanges();
+        }
+
         public BuildingObject GetObjectById(int id)
         {
             return _context.BuildingObjects.Single(obj => obj.Id == id);
+        }
+
+        public void RemoveBuildingObjectById(int id)
+        {
+            var toDelete = _context.BuildingObjects.Single(obj => obj.Id == id);
+            _context.BuildingObjects.Remove(toDelete);
+            _context.SaveChanges();
         }
     }
 }
