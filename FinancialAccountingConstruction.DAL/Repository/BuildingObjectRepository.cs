@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FinancialAccountingConstruction.DAL.Models;
+using FinancialAccountingConstruction.DAL.Models.Building;
 
 namespace FinancialAccountingConstruction.DAL.Repository
 {

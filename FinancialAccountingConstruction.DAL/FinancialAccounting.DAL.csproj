@@ -48,11 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FinancialAccountingDbContext.cs" />
-    <Compile Include="IDbContextProvider.cs" />
-    <Compile Include="Models\BuildingObject.cs" />
+    <Compile Include="Models\Building\BuildingObject.cs" />
+    <Compile Include="Models\Contractors\Contractor.cs" />
     <Compile Include="Models\Users\UserRoles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BuildingObjectRepository.cs" />
+    <Compile Include="Repository\ContractorRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

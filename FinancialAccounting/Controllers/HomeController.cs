@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using FinancialAccounting.Models.Biuldings;
-using FinancialAccountingConstruction.DAL.Models;
+using FinancialAccountingConstruction.DAL.Models.Building;
 using FinancialAccountingConstruction.DAL.Repository;
 
 namespace FinancialAccounting.Controllers

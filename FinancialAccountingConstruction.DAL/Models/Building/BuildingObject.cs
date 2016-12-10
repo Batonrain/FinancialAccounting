@@ -1,4 +1,4 @@
-﻿namespace FinancialAccountingConstruction.DAL.Models
+﻿namespace FinancialAccountingConstruction.DAL.Models.Building
 {
     public class BuildingObject
     {

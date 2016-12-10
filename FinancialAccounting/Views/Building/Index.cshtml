@@ -1,4 +1,5 @@
-﻿@model FinancialAccounting.Models.Biuldings.ManageBuildingViewModel
+﻿@using FinancialAccounting.Models.Biuldings
+@model ManageBuildingViewModel
 @{
     ViewBag.Title = "Управление объектом";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,20 +12,37 @@
             @Html.ActionLink("Редактировать описание объекта", "Remove", "Account", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
         <h3 style="margin-left:5px;text-align:right;float:right;">
-            @Html.ActionLink("Создать подрядчика", "Remove", "Account", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            @Html.ActionLink("Создать подрядчика", "CreateContractorForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
         <hr style="clear:both;" />
     </div>
 </div>
 
 <div class="row">
-    <table style="width: 100%;">
+    <table>
         <tr>
             <th>Название подрядчика</th>
             <th>Наличные рассчёты</th>
             <th>Безналичные рассчёты</th>
             <th>Дата платежа</th>
         </tr>
+        @foreach (var contractor in @Model.Contractors)
+        {
+            <tr style="border-collapse: separate; border-spacing: 0 5px;">
+                <td>
+                    @Html.ActionLink(contractor.Name, "Index", "Home", routeValues: new { @id = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                </td>
+                <td>
+                    Наличная сумма
+                </td>
+                <td>
+                    Безналичная сумма
+                </td>
+                <td>
+                    Статус даты платежа
+                </td>
+            </tr>
+        }
     </table>
 </div>
 

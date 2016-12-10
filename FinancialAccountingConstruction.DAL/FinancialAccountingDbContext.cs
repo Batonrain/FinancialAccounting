@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
-using FinancialAccountingConstruction.DAL.Models;
+using FinancialAccountingConstruction.DAL.Models.Building;
+using FinancialAccountingConstruction.DAL.Models.Contractors;
 
 namespace FinancialAccountingConstruction.DAL
 {
@@ -10,5 +11,12 @@ namespace FinancialAccountingConstruction.DAL
         { }
 
         public DbSet<BuildingObject> BuildingObjects { get; set; }
+        public DbSet<Contractor> Contractors { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            Database.SetInitializer<FinancialAccountingDbContext>(null);
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
