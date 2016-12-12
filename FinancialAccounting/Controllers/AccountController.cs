@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
-using FinancialAccountingConstruction.DAL;
 using FinancialAccountingConstruction.DAL.Models.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;

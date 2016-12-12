@@ -7,6 +7,7 @@ using FinancialAccountingConstruction.DAL.Repository;
 
 namespace FinancialAccounting.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly BuildingObjectRepository _buildingObjectRepository;
@@ -20,20 +21,6 @@ namespace FinancialAccounting.Controllers
         {
             var objects = _buildingObjectRepository.GetAllBuildingObjects();
             return View(ToBuildingList(objects));
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
         }
 
         private List<BuildingListItem> ToBuildingList(IEnumerable<BuildingObject> objects)

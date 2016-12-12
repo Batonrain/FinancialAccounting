@@ -9,6 +9,7 @@ using FinancialAccountingConstruction.DAL.Repository;
 
 namespace FinancialAccounting.Controllers
 {
+    [Authorize]
     public class BuildingController : Controller
     {
         private readonly BuildingObjectRepository _buildingObjectRepository;

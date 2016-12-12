@@ -56,6 +56,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BuildingObjectRepository.cs" />
     <Compile Include="Repository\ContractorRepository.cs" />
+    <Compile Include="Repository\PaymentsRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

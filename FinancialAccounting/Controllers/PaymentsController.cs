@@ -3,6 +3,7 @@ using FinancialAccountingConstruction.DAL.Repository;
 
 namespace FinancialAccounting.Controllers
 {
+    [Authorize]
     public class PaymentsController : Controller
     {
         private readonly BuildingObjectRepository _buildingObjectRepository;
