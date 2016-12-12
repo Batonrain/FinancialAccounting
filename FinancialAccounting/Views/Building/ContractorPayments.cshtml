@@ -11,9 +11,6 @@
         <h3 style="margin-left: 5px;text-align: right; float: right;">
             @Html.ActionLink("Редактировать описание подрядчика", "UpdateContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
-        <h3 style="margin-left:5px;text-align:right;float:right;">
-            @Html.ActionLink("Провести платёж", "CreatePaymentForContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
-        </h3>
         <hr style="clear:both;" />
     </div>
 </div>

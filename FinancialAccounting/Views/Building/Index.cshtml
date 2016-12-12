@@ -40,17 +40,39 @@
                     @Html.ActionLink(contractor.Name, "ContractorPayments", "Building", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
                 </td>
                 <td>
-                    Наличная сумма
+                    @Html.ActionLink("123.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })
                 </td>
                 <td>
-                    Безналичная сумма
+                    @Html.ActionLink("456.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = false }, htmlAttributes: new { @class = "btn btn-primary" })
                 </td>
                 <td>
                     Статус даты платежа
                 </td>
             </tr>
         }
+        <tr>
+            <td><b>Итого:</b></td>
+            <td> 517.000.00 </td>
+            <td> 614.000.00</td>
+            <td></td>
+        </tr>
     </table>
+    <hr style="clear:both;" />
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table>
+            <tr>
+                <td><b>Осталось заплатить:</b></td>
+                <td>11.200.000.00</td>
+            </tr>
+            <tr>
+                <td><b>Всего уплачено:</b></td>
+                <td>100.200.000.00</td>
+            </tr>
+        </table>
+    </div>
 </div>
 
 @section Scripts {

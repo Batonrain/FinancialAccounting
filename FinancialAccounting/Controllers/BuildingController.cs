@@ -124,16 +124,19 @@ namespace FinancialAccounting.Controllers
         public ActionResult UpdateContractor(int contractorId)
         {
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
-            var contractorViewModel = ToContractorViewModel(contractorObject);
+            var contractorViewModel = ToUpdateContractorViewModel(contractorObject);
 
             return View(contractorViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult UpdateContractor(ContractorViewModel contractor)
+        public ActionResult UpdateContractor(UpdateContractorViewModel contractor)
         {
-            return View();
+            var obj = ToUpdateContractorObj(contractor);
+            _contractorRepository.UpdateContractor(obj);
+
+            return RedirectToAction("Index", "Building", new { @id  = contractor.BuildingObjectId});
         }
 
         public ActionResult CreatePaymentForContractor(int contractorId)
@@ -165,8 +168,6 @@ namespace FinancialAccounting.Controllers
         {
             return View();
         }
-
-
 
         private BuildingViewModel ToBuildingViewModel(BuildingObject buildingObject)
         {
@@ -216,6 +217,38 @@ namespace FinancialAccounting.Controllers
                 PaymentDay = string.Format("{0} число", contractorObject.PaymentDay),
                 TotalCosts = contractorObject.TotalCosts,
                 Notes = contractorObject.Notes
+            };
+        }
+
+        private UpdateContractorViewModel ToUpdateContractorViewModel(Contractor contractorObject)
+        {
+            return new UpdateContractorViewModel
+            {
+                Id = contractorObject.Id,
+                Name = contractorObject.Name,
+                ContractDescriptions = contractorObject.ContractDescriptions,
+                BuildingObjectId = contractorObject.BuildingObjectId,
+                ContractNumbers = contractorObject.ContractNumbers,
+                TimingOfWorks = contractorObject.TimingOfWorks,
+                PaymentDay = contractorObject.PaymentDay,
+                TotalCosts = contractorObject.TotalCosts,
+                Notes = contractorObject.Notes
+            };
+        }
+
+        private Contractor ToUpdateContractorObj(UpdateContractorViewModel contractorViewModel)
+        {
+            return new Contractor
+            {
+                Id = contractorViewModel.Id,
+                Name = contractorViewModel.Name,
+                ContractDescriptions = contractorViewModel.ContractDescriptions,
+                BuildingObjectId = contractorViewModel.BuildingObjectId,
+                ContractNumbers = contractorViewModel.ContractNumbers,
+                TimingOfWorks = contractorViewModel.TimingOfWorks,
+                PaymentDay = contractorViewModel.PaymentDay,
+                TotalCosts = contractorViewModel.TotalCosts,
+                Notes = contractorViewModel.Notes
             };
         }
     }
