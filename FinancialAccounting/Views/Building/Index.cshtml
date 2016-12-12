@@ -1,7 +1,7 @@
 ﻿@using FinancialAccounting.Models.Biuldings
 @model ManageBuildingViewModel
 @{
-    ViewBag.Title = string.Format("Управление объектом '{0}'",  Model.BuildingMainInfo.Name);
+    ViewBag.Title = string.Format("Управление объектом '{0}'", Model.BuildingMainInfo.Name);
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -19,38 +19,41 @@
 </div>
 
 <div class="row">
-    
+    <div class="col-md-12">
+        @Html.DisplayFor(m => m.BuildingMainInfo.Description)
+    </div>
+    <hr style="clear:both;" />
 </div>
 
-    <div class="row">
-        <table>
-            <tr>
-                <th>Название подрядчика</th>
-                <th>Наличные рассчёты</th>
-                <th>Безналичные рассчёты</th>
-                <th>Дата платежа</th>
+<div class="row">
+    <table>
+        <tr>
+            <th>Название подрядчика</th>
+            <th>Наличные рассчёты</th>
+            <th>Безналичные рассчёты</th>
+            <th>Дата платежа</th>
+        </tr>
+        @foreach (var contractor in @Model.Contractors)
+        {
+            <tr style="border-collapse: separate; border-spacing: 0 5px;">
+                <td>
+                    @Html.ActionLink(contractor.Name, "ContractorPayments", "Building", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                </td>
+                <td>
+                    Наличная сумма
+                </td>
+                <td>
+                    Безналичная сумма
+                </td>
+                <td>
+                    Статус даты платежа
+                </td>
             </tr>
-            @foreach (var contractor in @Model.Contractors)
-            {
-                <tr style="border-collapse: separate; border-spacing: 0 5px;">
-                    <td>
-                        @Html.ActionLink(contractor.Name, "Index", "Home", routeValues: new { @id = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
-                    </td>
-                    <td>
-                        Наличная сумма
-                    </td>
-                    <td>
-                        Безналичная сумма
-                    </td>
-                    <td>
-                        Статус даты платежа
-                    </td>
-                </tr>
-            }
-        </table>
-    </div>
+        }
+    </table>
+</div>
 
-    @section Scripts {
-        @Scripts.Render("~/bundles/jqueryval")
-    }
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
 

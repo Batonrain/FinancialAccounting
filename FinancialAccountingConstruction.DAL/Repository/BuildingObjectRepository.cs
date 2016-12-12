@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FinancialAccountingConstruction.DAL.Models.Building;
+using FinancialAccountingConstruction.DAL.Models.Contractors;
 
 namespace FinancialAccountingConstruction.DAL.Repository
 {
@@ -43,6 +44,11 @@ namespace FinancialAccountingConstruction.DAL.Repository
             var toDelete = _context.BuildingObjects.Single(obj => obj.Id == id);
             _context.BuildingObjects.Remove(toDelete);
             _context.SaveChanges();
+        }
+
+        public Contractor GetContractorById(int id)
+        {
+            return _context.Contractors.Single(obj => obj.Id == id);
         }
     }
 }

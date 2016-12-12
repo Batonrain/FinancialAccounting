@@ -169,7 +169,9 @@
     <Compile Include="Models\Biuldings\BuildingListItem.cs" />
     <Compile Include="Models\Biuldings\BuildingViewModel.cs" />
     <Compile Include="Models\Biuldings\ManageBuildingViewModel.cs" />
+    <Compile Include="Models\Contractors\ContractorViewModel.cs" />
     <Compile Include="Models\Contractors\CreateContractorViewModel.cs" />
+    <Compile Include="Models\Contractors\CreatePaymentViewModel.cs" />
     <Compile Include="Models\Contractors\ShortContractorInfo.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -225,6 +227,8 @@
     <Content Include="Views\Partial1.cshtml" />
     <Content Include="Views\Building\ContractorPayments.cshtml" />
     <Content Include="Views\Building\UpdateObject.cshtml" />
+    <Content Include="Views\Building\UpdateContractor.cshtml" />
+    <Content Include="Views\Building\CreatePaymentForContractor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

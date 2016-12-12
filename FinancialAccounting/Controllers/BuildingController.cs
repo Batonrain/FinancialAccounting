@@ -1,11 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using FinancialAccounting.Models.Biuldings;
 using FinancialAccounting.Models.Contractors;
 using FinancialAccountingConstruction.DAL.Models.Building;
 using FinancialAccountingConstruction.DAL.Models.Contractors;
 using FinancialAccountingConstruction.DAL.Repository;
-using Newtonsoft.Json.Schema;
 
 namespace FinancialAccounting.Controllers
 {
@@ -40,8 +40,6 @@ namespace FinancialAccounting.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
-        
 
         public ActionResult CreateObject()
         {
@@ -99,11 +97,6 @@ namespace FinancialAccounting.Controllers
 
             return View(viewModel);
         }
-        public ActionResult ContractorPayments(int contractorId)
-        {
-
-            return View();
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -111,13 +104,69 @@ namespace FinancialAccounting.Controllers
         {
             if (ModelState.IsValid)
             {
-                _contractorRepository.AddContractor(ToContractorModel(contractor));
+                var contractorModel = ToContractorModel(contractor);
+                _contractorRepository.AddContractor(contractorModel);
 
                 return RedirectToAction("Index", new { @id = contractor.BuildingObjectId });
             }
 
             return View(contractor);
         }
+
+        public ActionResult ContractorPayments(int contractorId, bool? paymentsType)
+        {
+            var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
+            var contractorViewModel = ToContractorViewModel(contractorObject);
+
+            return View(contractorViewModel);
+        }
+
+        public ActionResult UpdateContractor(int contractorId)
+        {
+            var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
+            var contractorViewModel = ToContractorViewModel(contractorObject);
+
+            return View(contractorViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateContractor(ContractorViewModel contractor)
+        {
+            return View();
+        }
+
+        public ActionResult CreatePaymentForContractor(int contractorId)
+        {
+            var list = new List<SelectListItem>
+            {
+                new SelectListItem {Text = "08.2016", Selected = true, Value = "1"},
+                new SelectListItem {Text = "09.2016", Selected = true, Value = "2"},
+                new SelectListItem {Text = "10.2016", Selected = true, Value = "3"},
+                new SelectListItem {Text = "11.2016", Selected = true, Value = "4"}
+            };
+
+            var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
+            var contractorViewModel = new CreatePaymentViewModel
+            {
+                ContractorId = contractorObject.Id,
+                ContractorName = contractorObject.Name,
+                IsPlanned = false,
+                Summ = 0,
+                PeriodsOfPayments = list
+            };
+
+            return View(contractorViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreatePaymentForContractor(ContractorViewModel contractor)
+        {
+            return View();
+        }
+
+
 
         private BuildingViewModel ToBuildingViewModel(BuildingObject buildingObject)
         {
@@ -151,6 +200,22 @@ namespace FinancialAccounting.Controllers
                 PaymentDay = contractorViewModel.PaymentDay,
                 TotalCosts = contractorViewModel.TotalCosts,
                 Notes = contractorViewModel.Notes
+            };
+        }
+
+        private ContractorViewModel ToContractorViewModel(Contractor contractorObject)
+        {
+            return new ContractorViewModel
+            {
+                Id = contractorObject.Id,
+                Name = contractorObject.Name,
+                ContractDescriptions = contractorObject.ContractDescriptions,
+                BuildingObjectId = contractorObject.BuildingObjectId,
+                ContractNumbers = contractorObject.ContractNumbers,
+                TimingOfWorks = contractorObject.TimingOfWorks.ToShortDateString(),
+                PaymentDay = string.Format("{0} число", contractorObject.PaymentDay),
+                TotalCosts = contractorObject.TotalCosts,
+                Notes = contractorObject.Notes
             };
         }
     }
