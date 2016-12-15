@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FinancialAccounting.Models.Biuldings
+namespace FinancialAccounting.Models.Buildings
 {
     public class BuildingViewModel
     {

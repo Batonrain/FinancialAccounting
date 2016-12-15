@@ -1,0 +1,37 @@
+﻿@using FinancialAccounting.Models.Contractors
+@model List<ContractorViewModel>
+
+@{
+    ViewBag.Title = "Список подрядчиков";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
+        <h3 style="margin-left:5px;text-align:right;float:right;">
+            @Html.ActionLink("Создать подрядчика", "CreateContractor", "DataManagement", routeValues: new { @contractorId = 2 }, htmlAttributes: new { @class = "btn btn-primary" })
+        </h3>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div class="jumbotron">
+    @ContractorsList(Model)
+</div>
+
+@helper ContractorsList(IEnumerable<ContractorViewModel> models)
+{
+    <ul style="list-style-type: none">
+        @foreach (var b in models)
+        {
+            <li>
+                @Html.ActionLink(b.Name, "UpdateContractor", "DataManagement", routeValues: new { @contractorId = b.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            </li>
+        }
+    </ul>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

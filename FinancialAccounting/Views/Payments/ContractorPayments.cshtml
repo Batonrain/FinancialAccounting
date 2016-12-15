@@ -1,0 +1,60 @@
+﻿@*@model FinancialAccounting.Models.Contractors.ContractViewModel*@
+
+@{
+    ViewBag.Title = string.Format("Платежи подрядчика");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table>
+            <tr>
+                <th>Номер контракта</th>
+                <th>Тип</th>
+                <th>Сумма</th>
+                <th>Примечание к платежу</th>
+                <th>Соврешён</th>
+            </tr>
+            <tr>
+                <td>112233</td>
+                <td>Наличные</td>
+                <td>100,000,000</td>
+                <td>Электричество</td>
+                <td>Светлана Петровна</td>
+            </tr>
+            <tr>
+                <td>22334455</td>
+                <td>Безналичные</td>
+                <td>200,000,000</td>
+                <td>Мидии и кальмары</td>
+                <td>Аркадий Никифорович</td>
+            </tr>
+            <tr>
+                <td>33445566</td>
+                <td>Наличные</td>
+                <td>220,000,000</td>
+                <td>Пиво с чипасми</td>
+                <td>Семён Сигизмундович</td>
+            </tr>
+        </table>
+        <hr style="clear:both;" />
+        <table>
+            <tr>
+                <td><b>Итого уплачено:</b></td>
+                <td>123.000.000</td>
+            </tr>
+            <tr>
+                <td><b>Осталось выплатить:</b></td>
+                <td>777.000.000</td>
+            </tr>
+        </table>
+    </div>
+</div>
+

@@ -19,5 +19,13 @@ namespace FinancialAccounting.Controllers
         {
             return View();
         }
+
+        public ActionResult ContractorPayments(int contractorId, bool? paymentsType)
+        {
+            //var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
+            //var contractorViewModel = ToContractorViewModel(contractorObject);
+
+            return View();
+        }
 	}
 }

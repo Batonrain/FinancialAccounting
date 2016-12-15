@@ -1,5 +1,4 @@
-﻿@using FinancialAccounting.Models.Biuldings
-@model ManageBuildingViewModel
+﻿@model FinancialAccounting.Models.Buildings.ManageBuildingViewModel
 @{
     ViewBag.Title = string.Format("Управление объектом '{0}'", Model.BuildingMainInfo.Name);
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -12,7 +11,7 @@
             @Html.ActionLink("Редактировать описание объекта", "UpdateObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
         <h3 style="margin-left:5px;text-align:right;float:right;">
-            @Html.ActionLink("Создать подрядчика", "CreateContractorForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            @Html.ActionLink("Создать контракт", "CreateContractForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
         <hr style="clear:both;" />
     </div>
@@ -26,27 +25,61 @@
 </div>
 
 <div class="row">
-    <table>
+    <table >
         <tr>
-            <th>Название подрядчика</th>
-            <th>Наличные рассчёты</th>
-            <th>Безналичные рассчёты</th>
-            <th>Дата платежа</th>
+            <th style="text-align:center;">Название подрядчика</th>
+            <th style="text-align:center;">Наличные рассчёты</th>
+            <th style="text-align:center;">Безналичные рассчёты</th>
+            <th style="text-align:center;">Дата платежа</th>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table style="text-align:center;">
+                    <tr>
+                        <td style="width: 33%; font-weight: bold;">Всего должны</td>
+                        <td style="width: 33%; font-weight: bold;">Оплачено</td>
+                        <td style="width: 33%; font-weight: bold;">Остаток</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table style="text-align:center;">
+                    <tr>
+                        <td style="width: 33%; font-weight: bold;">Всего должны</td>
+                        <td style="width: 33%; font-weight: bold;">Оплачено</td>
+                        <td style="width: 33%; font-weight: bold;">Остаток</td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
         </tr>
         @foreach (var contractor in @Model.Contractors)
         {
             <tr style="border-collapse: separate; border-spacing: 0 5px;">
                 <td>
-                    @Html.ActionLink(contractor.Name, "ContractorPayments", "Building", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                    @Html.ActionLink(contractor.Name, "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
                 </td>
                 <td>
-                    @Html.ActionLink("123.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })
+                    <table style="text-align:center;">
+                        <tr>
+                            <td>@Html.ActionLink("123.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink("123.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink("123.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                        </tr>
+                    </table>
                 </td>
                 <td>
-                    @Html.ActionLink("456.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = false }, htmlAttributes: new { @class = "btn btn-primary" })
+                    <table style="text-align:center;">
+                        <tr>
+                            <td>@Html.ActionLink("456.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink("456.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink("456.000.00", "Index", "Payments", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                        </tr>
+                    </table>
                 </td>
                 <td>
-                    Статус даты платежа
+                    <label style="background-color: red;">Статус даты платежа</label>
                 </td>
             </tr>
         }

@@ -1,9 +1,10 @@
 ﻿@model System.Web.Mvc.HandleErrorInfo
 
 @{
-    ViewBag.Title = "Error";
+    ViewBag.Title = "Ошибка";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<h1 class="text-danger">Ошибка.</h1>
+<h2 class="text-danger">Во время работы приложения произошла ошибка.</h2>
+<h3 class="text-danger">Пожалуйтса, перейдите на @Html.ActionLink("главную страницу", "Index", "Home") и попробуйте снова.</h3>
 

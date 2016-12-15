@@ -160,6 +160,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BuildingController.cs" />
+    <Compile Include="Controllers\DataManagementController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PaymentsController.cs" />
     <Compile Include="Extensions\HtmlDropDownExtensions.cs" />
@@ -167,14 +168,15 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\Biuldings\BuildingListItem.cs" />
-    <Compile Include="Models\Biuldings\BuildingViewModel.cs" />
-    <Compile Include="Models\Biuldings\ManageBuildingViewModel.cs" />
+    <Compile Include="Models\Buildings\BuildingListItem.cs" />
+    <Compile Include="Models\Buildings\BuildingViewModel.cs" />
+    <Compile Include="Models\Buildings\ManageBuildingViewModel.cs" />
     <Compile Include="Models\Contractors\ContractorViewModel.cs" />
-    <Compile Include="Models\Contractors\CreateContractorViewModel.cs" />
-    <Compile Include="Models\Contractors\CreatePaymentViewModel.cs" />
-    <Compile Include="Models\Contractors\ShortContractorInfo.cs" />
-    <Compile Include="Models\Contractors\UpdateContractorViewModel.cs" />
+    <Compile Include="Models\Contracts\ContractViewModel.cs" />
+    <Compile Include="Models\Contracts\CreateContractViewModel.cs" />
+    <Compile Include="Models\Contracts\CreatePaymentViewModel.cs" />
+    <Compile Include="Models\Contracts\ShortContractInfo.cs" />
+    <Compile Include="Models\Contracts\UpdateContractorViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -224,13 +226,16 @@
     <Content Include="Views\Building\Index.cshtml" />
     <Content Include="Views\Account\ManageAccounts.cshtml" />
     <Content Include="Views\Building\CreateObject.cshtml" />
-    <Content Include="Views\Building\CreateContractorForObject.cshtml" />
-    <Content Include="Views\Partial1.cshtml" />
-    <Content Include="Views\Building\ContractorPayments.cshtml" />
+    <Content Include="Views\Building\CreateContractForObject.cshtml" />
+    <Content Include="Views\Payments\ContractorPayments.cshtml" />
     <Content Include="Views\Building\UpdateObject.cshtml" />
     <Content Include="Views\Building\UpdateContractor.cshtml" />
     <Content Include="Views\Building\CreatePaymentForContractor.cshtml" />
     <Content Include="Views\Payments\Index.cshtml" />
+    <Content Include="Views\DataManagement\Index.cshtml" />
+    <Content Include="Views\DataManagement\CreateContractor.cshtml" />
+    <Content Include="Views\DataManagement\UpdateContractor.cshtml" />
+    <Content Include="Views\DataManagement\ViewContractors.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -240,7 +245,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
-    <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FinancialAccountingConstruction.DAL\FinancialAccounting.DAL.csproj">

@@ -1,0 +1,21 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Управление данными";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div>
+    <div class="col-md-12">
+        <div>
+            @Html.ActionLink("Список подрядчиков", "ViewContractors", "DataManagement", htmlAttributes: new { @class = "btn btn-primary" })
+        </div>
+    </div>
+</div>

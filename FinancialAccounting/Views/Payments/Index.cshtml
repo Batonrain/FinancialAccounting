@@ -16,13 +16,18 @@
 <div class="row">
     <table style="text-align:center;">
         <tr style="text-align:center;">
+            <th style="text-align:center;">Номер контракта</th>
             <th style="text-align:center;">Сумма платежа</th>
             <th style="text-align:center;">Дата проведения</th>
             <th style="text-align:center;">Комментарий к платежу</th>
+            <th style="text-align:center;">Совершён</th>
         </tr>
         @for (int i = 1; i <= 5; i++)
         {
             <tr style="border-collapse: separate; border-spacing: 0 5px;">
+                <td>
+                    ВАА112233
+                </td>
                 <td>
                     456.000.00
                 </td>
@@ -32,6 +37,9 @@
                 <td>
                     Здесь может быть очень большой или очень лаконичный комментарий.
                 </td>
+                <td>
+                    Наталья Петровна
+                </td>
             </tr>
         }
     </table>
@@ -40,6 +48,10 @@
         <tr>
             <td><b>Итого уплачено:</b></td>
             <td>123.000.000</td>
+        </tr>
+        <tr>
+            <td><b>Осталось выплатить:</b></td>
+            <td>777.000.000</td>
         </tr>
     </table>
 </div>

@@ -49,13 +49,15 @@
   <ItemGroup>
     <Compile Include="FinancialAccountingDbContext.cs" />
     <Compile Include="Models\Building\BuildingObject.cs" />
-    <Compile Include="Models\Contractors\Contractor.cs" />
+    <Compile Include="Models\Contracts\Contract.cs" />
+    <Compile Include="Models\Contracts\Contractor.cs" />
     <Compile Include="Models\Payments\Payment.cs" />
     <Compile Include="Models\Payments\PlannedPaymentsDate.cs" />
     <Compile Include="Models\Users\UserRoles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BuildingObjectRepository.cs" />
     <Compile Include="Repository\ContractorRepository.cs" />
+    <Compile Include="Repository\ContractRepository.cs" />
     <Compile Include="Repository\PaymentsRepository.cs" />
   </ItemGroup>
   <ItemGroup>

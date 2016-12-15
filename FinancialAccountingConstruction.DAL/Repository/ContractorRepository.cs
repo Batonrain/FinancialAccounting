@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FinancialAccountingConstruction.DAL.Models.Building;
-using FinancialAccountingConstruction.DAL.Models.Contractors;
+using FinancialAccountingConstruction.DAL.Models.Contracts;
 
 namespace FinancialAccountingConstruction.DAL.Repository
 {
@@ -12,6 +11,11 @@ namespace FinancialAccountingConstruction.DAL.Repository
         public ContractorRepository()
         {
             _context = new FinancialAccountingDbContext();
+        }
+
+        public IEnumerable<Contractor> GetAllContractors()
+        {
+            return _context.Contractors.ToList();
         }
 
         public Contractor GetContractorById(int id)
@@ -25,22 +29,19 @@ namespace FinancialAccountingConstruction.DAL.Repository
             _context.SaveChanges();
         }
 
-        public IEnumerable<Contractor> GetBuildingContractors(int buildingId)
+        public void UpdateContract(Contractor contract)
         {
-            return _context.Contractors.Where(contr => contr.BuildingObjectId == buildingId);
-        }
-
-        public void UpdateContractor(Contractor contractor)
-        {
-            _context.Contractors.Attach(contractor);
-            var entry = _context.Entry(contractor);
+            _context.Contractors.Attach(contract);
+            var entry = _context.Entry(contract);
             entry.Property(e => e.Name).IsModified = true;
             entry.Property(e => e.Notes).IsModified = true;
-            entry.Property(e => e.PaymentDay).IsModified = true;
-            entry.Property(e => e.ContractDescriptions).IsModified = true;
-            entry.Property(e => e.ContractNumbers).IsModified = true;
-            entry.Property(e => e.TimingOfWorks).IsModified = true;
-            entry.Property(e => e.TotalCosts).IsModified = true;
+            _context.SaveChanges();
+        }
+
+        public void RemoveContract(int id)
+        {
+            var toDelete = _context.Contractors.Single(c => c.Id == id);
+            _context.Contractors.Remove(toDelete);
             _context.SaveChanges();
         }
     }

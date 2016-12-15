@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FinancialAccounting.Models.Contractors
 {
-    public class CreateContractorViewModel
+    public class UpdateContractorViewModel
     {
+        public int Id { get; set; }
+
         public int BuildingObjectId { get; set; }
 
         [Required]
@@ -40,6 +42,5 @@ namespace FinancialAccounting.Models.Contractors
         [Required]
         [Display(Name = "Итоговая стоимость работ")]
         public decimal TotalCosts { get; set; }
-        
     }
 }
