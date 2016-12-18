@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FinancialAccountingConstruction.DAL.Models.Building;
-using FinancialAccountingConstruction.DAL.Models.Contracts;
+using FinancialAccountingConstruction.DAL.Models.Contractors;
 
 namespace FinancialAccountingConstruction.DAL.Repository
 {

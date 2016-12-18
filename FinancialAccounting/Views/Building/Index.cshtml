@@ -11,7 +11,7 @@
             @Html.ActionLink("Редактировать описание объекта", "UpdateObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
         <h3 style="margin-left:5px;text-align:right;float:right;">
-            @Html.ActionLink("Создать контракт", "CreateContractForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            @Html.ActionLink("Добавить подрядчика", "CreateContractorForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
         <hr style="clear:both;" />
     </div>

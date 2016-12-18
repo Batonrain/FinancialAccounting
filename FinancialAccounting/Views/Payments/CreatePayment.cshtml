@@ -1,0 +1,40 @@
+﻿@model FinancialAccounting.Models.Payments.CreatePaymentViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+       @using (Html.BeginForm("CreatePayment", "Payments", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+    @Html.HiddenFor(m => m.ContractorId)
+    <div class="form-group">
+        @Html.LabelFor(m => m.Name, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Summ, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Summ, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Провести платёж" class="btn btn-default" />
+        </div>
+    </div>
+}
+    </div>
+</div>

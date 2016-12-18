@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using FinancialAccountingConstruction.DAL.Models.Payments;
 
 namespace FinancialAccountingConstruction.DAL.Repository
@@ -12,9 +14,38 @@ namespace FinancialAccountingConstruction.DAL.Repository
             _context = new FinancialAccountingDbContext();
         }
 
-        public void AddPlannedPayments(IEnumerable<PlannedPaymentsDate> dates)
+        public void AddPlannedPayment(PlannedPaymentsDate date)
         {
-            _context.PlannedPaymentsDates.AddRange(dates);
+            _context.PlannedPaymentsDates.Add(date);
+            _context.SaveChanges();
+        }
+        public void AddPayment(Payment payment)
+        {
+            _context.Payments.Add(payment);
+            _context.SaveChanges();
+        }
+
+        public IEnumerable<PlannedPaymentsDate> GetPlannedPaymentsDatesByContractorId(int id)
+        {
+            return _context.PlannedPaymentsDates.Where(p => p.ContractorId == id && !p.IsPayed);
+        }
+
+        public IEnumerable<Payment> GetPaymentsForContractor(int id)
+        {
+            return _context.Payments.Where(p => p.ContractorId == id);
+        }
+
+        public void Remove(PlannedPaymentsDate date)
+        {
+            _context.PlannedPaymentsDates.Remove(date);
+            _context.SaveChanges();
+        }
+
+        public void RemoveAllForContractor(int id)
+        {
+            var dates = _context.PlannedPaymentsDates.Where(p => p.ContractorId == id && !p.IsPayed);
+
+            _context.PlannedPaymentsDates.RemoveRange(dates);
             _context.SaveChanges();
         }
     }

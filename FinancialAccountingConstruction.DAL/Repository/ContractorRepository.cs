@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FinancialAccountingConstruction.DAL.Models.Contracts;
+using FinancialAccountingConstruction.DAL.Models.Contractors;
 
 namespace FinancialAccountingConstruction.DAL.Repository
 {
@@ -13,36 +13,27 @@ namespace FinancialAccountingConstruction.DAL.Repository
             _context = new FinancialAccountingDbContext();
         }
 
-        public IEnumerable<Contractor> GetAllContractors()
+        public int AddContractor(Contractor contract)
         {
-            return _context.Contractors.ToList();
-        }
-
-        public Contractor GetContractorById(int id)
-        {
-            return _context.Contractors.Single(contr => contr.Id == id);
-        }
-
-        public void AddContractor(Contractor contractor)
-        {
-            _context.Contractors.Add(contractor);
+            _context.Contractors.Add(contract);
             _context.SaveChanges();
+            return contract.Id;
         }
 
-        public void UpdateContract(Contractor contract)
+        public void UpdateContractor(Contractor contract)
         {
             _context.Contractors.Attach(contract);
             var entry = _context.Entry(contract);
             entry.Property(e => e.Name).IsModified = true;
-            entry.Property(e => e.Notes).IsModified = true;
+            entry.Property(e => e.Description).IsModified = true;
+            entry.Property(e => e.TotalCostsInCash).IsModified = true;
+            entry.Property(e => e.TotalCostsCashless).IsModified = true;
             _context.SaveChanges();
         }
 
-        public void RemoveContract(int id)
+        public IEnumerable<Contractor> GetAllContractorsForBuilding(int id)
         {
-            var toDelete = _context.Contractors.Single(c => c.Id == id);
-            _context.Contractors.Remove(toDelete);
-            _context.SaveChanges();
+            return _context.Contractors.Where(c => c.BuildingObjectId == id).ToList();
         }
     }
 }

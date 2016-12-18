@@ -7,5 +7,6 @@ namespace FinancialAccountingConstruction.DAL.Models.Payments
         public int Id { get; set; }
         public int ContractorId { get; set; }
         public DateTime Date { get; set; }
+        public bool IsPayed { get; set; }
     }
 }

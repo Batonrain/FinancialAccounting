@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 using FinancialAccounting.Models.Buildings;
 using FinancialAccounting.Models.Contractors;
 using FinancialAccounting.Models.Contracts;
 using FinancialAccountingConstruction.DAL.Models.Building;
-using FinancialAccountingConstruction.DAL.Models.Contracts;
+using FinancialAccountingConstruction.DAL.Models.Contractors;
 using FinancialAccountingConstruction.DAL.Models.Payments;
 using FinancialAccountingConstruction.DAL.Repository;
 
@@ -16,14 +18,14 @@ namespace FinancialAccounting.Controllers
     public class BuildingController : Controller
     {
         private readonly BuildingObjectRepository _buildingObjectRepository;
-        private readonly ContractRepository _contractsRepository;
-        private readonly ContractorRepository _contractorRepository;
+        private readonly ContractorRepository _contractorsRepository;
+        private readonly PaymentsRepository _paymentsRepository;
 
         public BuildingController()
         {
             _buildingObjectRepository = new BuildingObjectRepository();
-            _contractsRepository = new ContractRepository();
-            _contractorRepository = new ContractorRepository();
+            _contractorsRepository = new ContractorRepository();
+            _paymentsRepository = new PaymentsRepository();
         }
 
         public ActionResult Index(int id)
@@ -32,11 +34,9 @@ namespace FinancialAccounting.Controllers
             {
                 var model = new ManageBuildingViewModel();
                 var buildingObject = _buildingObjectRepository.GetObjectById(id);
-                var contracts = _contractsRepository.GetAllContractsForBuilding(id);
 
                 model.BuildingMainInfo = ToBuildingViewModel(buildingObject);
-                var list = contracts.Select(s => s.ContractorId).ToList();
-                model.Contractors = _contractsRepository.GetAllContractorsRelatedToTheContracts(list);
+                model.Contractors = _contractorsRepository.GetAllContractorsForBuilding(id);
 
                 return View(model);
             }
@@ -91,18 +91,11 @@ namespace FinancialAccounting.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public ActionResult CreateContractForObject(int buildingId)
+        public ActionResult CreateContractorForObject(int buildingId)
         {
-            var contractors = _contractorRepository.GetAllContractors().ToList();
-            var contractorsList = contractors.Select(contractor => new SelectListItem
+            var viewModel = new CreateContractorViewModel()
             {
-                Text = contractor.Name, Value = contractor.Id.ToString()
-            }).ToList();
-
-            var viewModel = new CreateContractViewModel()
-            {
-                BuildingObjectId = buildingId,
-                Contractors = contractorsList
+                BuildingObjectId = buildingId
             };
 
             return View(viewModel);
@@ -110,70 +103,79 @@ namespace FinancialAccounting.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateContractForObject(CreateContractViewModel contract)
+        public ActionResult CreateContractorForObject(CreateContractorViewModel contractor)
         {
             if (ModelState.IsValid)
             {
-                var contractorModel = ToContractorModel(contract);
-                _contractsRepository.AddContract(contractorModel);
+                var contractorModel = ToContractorModel(contractor);
+                var contractorId = _contractorsRepository.AddContractor(contractorModel);
 
-                return RedirectToAction("Index", new { @id = contract.BuildingObjectId });
+                if (!string.IsNullOrEmpty(contractor.RequriedDates))
+                {
+                    var listOfDates = contractor.RequriedDates.Split(',');
+                    foreach (var date in listOfDates)
+                    {
+                        _paymentsRepository.AddPlannedPayment(new PlannedPaymentsDate()
+                        {
+                            ContractorId = contractorId,
+                            Date = DateTime.Parse(date),
+                            IsPayed = false
+                        });
+                    }
+                }
+
+                return RedirectToAction("Index", new { @id = contractor.BuildingObjectId });
             }
 
-            return View(contract);
+            return View(contractor);
         }
 
         public ActionResult UpdateContractor(int contractorId)
         {
-            //var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
-            //var contractorViewModel = ToUpdateContractorViewModel(contractorObject);
-
-            return View();
-        }
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult UpdateContractor(UpdateContractorViewModel contractor)
-        //{
-        //    var obj = ToUpdateContractorObj(contractor);
-        //    _contractorRepository.UpdateContractor(obj);
-
-        //    return RedirectToAction("Index", "Building", new { @id  = contractor.BuildingObjectId});
-        //}
-
-        public ActionResult CreatePaymentForContractor(int contractorId)
-        {
-            var list = new List<SelectListItem>
-            {
-                new SelectListItem {Text = "08.2016", Selected = true, Value = "1"},
-                new SelectListItem {Text = "09.2016", Selected = true, Value = "2"},
-                new SelectListItem {Text = "10.2016", Selected = true, Value = "3"},
-                new SelectListItem {Text = "11.2016", Selected = true, Value = "4"}
-            };
-
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
-            var contractorViewModel = new CreatePaymentViewModel
+            var requieredDates = _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId).ToList();
+            var contractorViewModel = ToUpdateContractorViewModel(contractorObject);
+
+            var reqDates = new StringBuilder();
+            if (requieredDates.Any())
             {
-                ContractorId = contractorObject.Id,
-                ContractorName = contractorObject.Name,
-                IsPlanned = false,
-                Summ = 0
-                //,
-                //PeriodsOfPayments = list
-            };
+                reqDates = requieredDates.Aggregate(reqDates, (current, plannedPaymentsDate) => current.Append(string.Format("{0}, ", plannedPaymentsDate)));
+                contractorViewModel.RequriedDates = reqDates.ToString();
+            }
+
+
 
             return View(contractorViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreatePaymentForContractor(ContractorViewModel contractor)
+        public ActionResult UpdateContractor(UpdateContractorViewModel contractor)
         {
-            return View();
+            var obj = ToUpdateContractorObj(contractor);
+            _contractorsRepository.UpdateContractor(obj);
+
+            if (!string.IsNullOrEmpty(contractor.RequriedDates))
+            {
+                _paymentsRepository.RemoveAllForContractor(obj.Id);
+                var listOfDates = contractor.RequriedDates.Split(',');
+                foreach (var date in listOfDates)
+                {
+                    var parsedDate = DateTime.ParseExact(date, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    _paymentsRepository.AddPlannedPayment(new PlannedPaymentsDate()
+                    {
+                        ContractorId = obj.Id,
+                        Date = parsedDate,
+                        IsPayed = false
+                    });
+                }
+            }
+
+            return RedirectToAction("ContractorPayments", "Payments", new { @contractorId = contractor.Id });
         }
 
         #region DataTransformers
-        
+
         private BuildingViewModel ToBuildingViewModel(BuildingObject buildingObject)
         {
             return new BuildingViewModel
@@ -194,86 +196,42 @@ namespace FinancialAccounting.Controllers
             };
         }
 
-        private Contract ToContractorModel(CreateContractViewModel contractsViewModel)
+        private Contractor ToContractorModel(CreateContractorViewModel contractorViewModel)
         {
-            return new Contract
+            return new Contractor
             {
-                Number = contractsViewModel.Number,
-                Description = contractsViewModel.Descriptions,
-                BuildingObjectId = contractsViewModel.BuildingObjectId,
-                ContractorId = contractsViewModel.ContractorId
+                Name = contractorViewModel.Name,
+                Description = contractorViewModel.Descriptions,
+                BuildingObjectId = contractorViewModel.BuildingObjectId,
+                TotalCostsCashless = Convert.ToDecimal(contractorViewModel.TotalCostsCashless),
+                TotalCostsInCash = Convert.ToDecimal(contractorViewModel.TotalCostsInCash)
             };
         }
 
-        //private ContractorViewModel ToContractorViewModel(Contractor contractorObject)
-        //{
-        //    return new ContractorViewModel
-        //    {
-        //        Id = contractorObject.Id,
-        //        Name = contractorObject.Name,
-        //        ContractDescriptions = contractorObject.ContractDescriptions,
-        //        BuildingObjectId = contractorObject.BuildingObjectId,
-        //        ContractNumbers = contractorObject.ContractNumbers,
-        //        TimingOfWorks = contractorObject.TimingOfWorks.ToShortDateString(),
-        //        PaymentDay = string.Format("{0} число", contractorObject.PaymentDay),
-        //        TotalCosts = contractorObject.TotalCosts,
-        //        Notes = contractorObject.Notes
-        //    };
-        //}
-
-        //private UpdateContractorViewModel ToUpdateContractorViewModel(Contractor contractorObject)
-        //{
-        //    return new UpdateContractorViewModel
-        //    {
-        //        Id = contractorObject.Id,
-        //        Name = contractorObject.Name,
-        //        ContractDescriptions = contractorObject.ContractDescriptions,
-        //        BuildingObjectId = contractorObject.BuildingObjectId,
-        //        ContractNumbers = contractorObject.ContractNumbers,
-        //        TimingOfWorks = contractorObject.TimingOfWorks,
-        //        PaymentDay = contractorObject.PaymentDay,
-        //        TotalCosts = contractorObject.TotalCosts,
-        //        Notes = contractorObject.Notes
-        //    };
-        //}
-
-        //private Contractor ToUpdateContractorObj(UpdateContractorViewModel contractorViewModel)
-        //{
-        //    return new Contractor
-        //    {
-        //        Id = contractorViewModel.Id,
-        //        Name = contractorViewModel.Name,
-        //        ContractDescriptions = contractorViewModel.ContractDescriptions,
-        //        BuildingObjectId = contractorViewModel.BuildingObjectId,
-        //        ContractNumbers = contractorViewModel.ContractNumbers,
-        //        TimingOfWorks = contractorViewModel.TimingOfWorks,
-        //        PaymentDay = contractorViewModel.PaymentDay,
-        //        TotalCosts = contractorViewModel.TotalCosts,
-        //        Notes = contractorViewModel.Notes
-        //    };
-        //}
-
-        #endregion
-
-        #region Payments
-
-        private void AddPayments(int date, DateTime timingOfWorks, int contractorId)
+        private UpdateContractorViewModel ToUpdateContractorViewModel(Contractor contractorObject)
         {
-            var dayNumber = 1;
-            if (date >= 31)
+            return new UpdateContractorViewModel
             {
-                dayNumber = 30;
-            }
-            var todayDate = DateTime.Now;
-            var months = MonthsBetween(timingOfWorks, DateTime.Now);
-            var dates = new List<PlannedPaymentsDate>();
-
+                Id = contractorObject.Id,
+                Name = contractorObject.Name,
+                Descriptions = contractorObject.Description,
+                BuildingObjectId = contractorObject.BuildingObjectId,
+                TotalCostsCashless = contractorObject.TotalCostsCashless,
+                TotalCostsInCash = contractorObject.TotalCostsInCash
+            };
         }
 
-        static IEnumerable<DateTime> MonthsBetween(DateTime d0, DateTime d1)
+        private Contractor ToUpdateContractorObj(UpdateContractorViewModel contractorViewModel)
         {
-            return Enumerable.Range(0, (d1.Year - d0.Year) * 12 + (d1.Month - d0.Month + 1))
-                             .Select(m => new DateTime(d0.Year, d0.Month, 1).AddMonths(m));
+            return new Contractor
+            {
+                Id = contractorViewModel.Id,
+                Name = contractorViewModel.Name,
+                Description = contractorViewModel.Descriptions,
+                BuildingObjectId = contractorViewModel.BuildingObjectId,
+                TotalCostsCashless = Convert.ToDecimal(contractorViewModel.TotalCostsCashless),
+                TotalCostsInCash = Convert.ToDecimal(contractorViewModel.TotalCostsInCash)
+            };
         }
 
         #endregion

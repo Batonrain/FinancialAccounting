@@ -1,19 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using FinancialAccounting.Models.Payments;
 
 namespace FinancialAccounting.Models.Contractors
 {
-    public class ContractorViewModel
+    public class ContractorPaymentsViewModel
     {
         public int Id { get; set; }
-
-        [Required]
-        [Display(Name = "Названия подрядчика")]
-        [StringLength(100, ErrorMessage = "Поле 'Названия подрядчика' не должно быть короче 3х символов.", MinimumLength = 3)]
+        public int BuildingObjectId { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal TotalCostsInCash { get; set; }
+        public decimal TotalCostsCashless { get; set; }
 
-        [Required]
-        [Display(Name = "Описание подрядчика")]
-        [StringLength(1000, ErrorMessage = "Поле 'Описание подрядчика' не должно быть короче 3х символов.", MinimumLength = 3)]
-        public string Notes { get; set; }
+        public List<PaymentViewModel> Payments { get; set; }
+        public PaymentSummaryViewModel PaymentsSummary { get; set; }
     }
 }
