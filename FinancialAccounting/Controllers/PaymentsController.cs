@@ -22,7 +22,7 @@ namespace FinancialAccounting.Controllers
             _paymentsRepository = new PaymentsRepository();
         }
 
-        public ActionResult Index(int contractorId, bool? isInCash)
+        public ActionResult Index(int contractorId)
         {
             return View();
         }
@@ -32,8 +32,21 @@ namespace FinancialAccounting.Controllers
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
 
             var contractorViewModel = ToContractorPaymentsViewModel(contractorObject);
-            
+
             var allPayments = _paymentsRepository.GetPaymentsForContractor(contractorId).ToList();
+
+            var needToPayByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash -
+                                          allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ);
+
+            contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel()
+            {
+                NeedToPayByContract = needToPayByContract,
+                PayedByContract = allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ),
+                SummByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash
+            };
+
+            contractorViewModel.Payments = new List<PaymentViewModel>();
+
             if (allPayments.Any())
             {
                 var inCashNeedToPayByContract = contractorObject.TotalCostsInCash -
@@ -44,25 +57,16 @@ namespace FinancialAccounting.Controllers
                                                 allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId)
                                                     .Sum(p => p.Summ);
 
-                var needToPayByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash -
-                                          allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ);
+                contractorViewModel.PaymentsSummary.InCashNeedToPayByContract = inCashNeedToPayByContract;
+                contractorViewModel.PaymentsSummary.InCashPayedByContract =
+                    allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
+                contractorViewModel.PaymentsSummary.InCashSummByContract = contractorObject.TotalCostsInCash;
 
-                contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel
-                    {
-                        InCashNeedToPayByContract = inCashNeedToPayByContract,
-                        InCashPayedByContract = allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ),
-                        InCashSummByContract = contractorObject.TotalCostsInCash,
+                contractorViewModel.PaymentsSummary.InCashlessNeedToPayByContract = inCashlessNeedToPayByContract;
+                contractorViewModel.PaymentsSummary.InCashlessPayedByContract =
+                    allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
+                contractorViewModel.PaymentsSummary.InCashlessSummByContract = contractorObject.TotalCostsCashless;
 
-                        InCashlessNeedToPayByContract = inCashlessNeedToPayByContract,
-                        InCashlessPayedByContract = allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ),
-                        InCashlessSummByContract = contractorObject.TotalCostsCashless,
-
-                        NeedToPayByContract = needToPayByContract,
-                        PayedByContract = allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ),
-                        SummByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash
-                    };
-
-                contractorViewModel.Payments = new List<PaymentViewModel>();
                 foreach (var payment in allPayments)
                 {
                     contractorViewModel.Payments.Add(new PaymentViewModel
@@ -106,7 +110,7 @@ namespace FinancialAccounting.Controllers
             var newPayment = ToPaymentObject(paymentViewModel);
             _paymentsRepository.AddPayment(newPayment);
 
-            return RedirectToAction("ContractorPayments", new {@contractorId = paymentViewModel.ContractorId});
+            return RedirectToAction("ContractorPayments", new { @contractorId = paymentViewModel.ContractorId });
         }
 
         private ContractorPaymentsViewModel ToContractorPaymentsViewModel(Contractor contractor)

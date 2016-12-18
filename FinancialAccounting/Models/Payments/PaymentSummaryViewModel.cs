@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace FinancialAccounting.Models.Payments
+﻿namespace FinancialAccounting.Models.Payments
 {
     public class PaymentSummaryViewModel
     {

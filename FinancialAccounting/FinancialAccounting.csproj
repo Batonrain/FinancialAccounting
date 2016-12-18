@@ -170,6 +170,7 @@
     <Compile Include="Models\Buildings\BuildingListItem.cs" />
     <Compile Include="Models\Buildings\BuildingViewModel.cs" />
     <Compile Include="Models\Buildings\ManageBuildingViewModel.cs" />
+    <Compile Include="Models\Contractors\ContractorsShortInfo.cs" />
     <Compile Include="Models\Contractors\ContractorViewModel.cs" />
     <Compile Include="Models\Contracts\ContractViewModel.cs" />
     <Compile Include="Models\Contracts\CreateContractorViewModel.cs" />

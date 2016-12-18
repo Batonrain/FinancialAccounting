@@ -12,6 +12,8 @@ namespace FinancialAccounting.Models.Contractors
         public decimal TotalCostsInCash { get; set; }
         public decimal TotalCostsCashless { get; set; }
 
+        public string Status { get;set }
+
         public List<PaymentViewModel> Payments { get; set; }
         public PaymentSummaryViewModel PaymentsSummary { get; set; }
     }

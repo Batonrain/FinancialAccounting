@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using FinancialAccounting.Models.Buildings;
 using FinancialAccounting.Models.Contractors;
 using FinancialAccounting.Models.Contracts;
+using FinancialAccounting.Models.Payments;
 using FinancialAccountingConstruction.DAL.Models.Building;
 using FinancialAccountingConstruction.DAL.Models.Contractors;
 using FinancialAccountingConstruction.DAL.Models.Payments;
@@ -35,8 +36,15 @@ namespace FinancialAccounting.Controllers
                 var model = new ManageBuildingViewModel();
                 var buildingObject = _buildingObjectRepository.GetObjectById(id);
 
+                var contractorsId = _contractorsRepository.GetAllContractorsForBuilding(id).Select(s => s.Id);
+
                 model.BuildingMainInfo = ToBuildingViewModel(buildingObject);
-                model.Contractors = _contractorsRepository.GetAllContractorsForBuilding(id);
+                model.Contractors = new List<ContractorPaymentsViewModel>();
+
+                foreach (var contractorId in contractorsId)
+                {
+                    model.Contractors.Add(GetContractorData(contractorId));
+                }
 
                 return View(model);
             }
@@ -115,10 +123,11 @@ namespace FinancialAccounting.Controllers
                     var listOfDates = contractor.RequriedDates.Split(',');
                     foreach (var date in listOfDates)
                     {
+                        var parsedDate = DateTime.ParseExact(date, "MM/dd/yyyy", CultureInfo.InvariantCulture);
                         _paymentsRepository.AddPlannedPayment(new PlannedPaymentsDate()
                         {
                             ContractorId = contractorId,
-                            Date = DateTime.Parse(date),
+                            Date = parsedDate,
                             IsPayed = false
                         });
                     }
@@ -139,11 +148,14 @@ namespace FinancialAccounting.Controllers
             var reqDates = new StringBuilder();
             if (requieredDates.Any())
             {
-                reqDates = requieredDates.Aggregate(reqDates, (current, plannedPaymentsDate) => current.Append(string.Format("{0}, ", plannedPaymentsDate)));
-                contractorViewModel.RequriedDates = reqDates.ToString();
+                foreach (var date in requieredDates)
+                {
+                    var dateToFormat = String.Format("{0:MM/dd/yyyy}", date.Date).Replace('.', '/');
+                    reqDates = reqDates.AppendFormat("{0}, ", dateToFormat);
+                }
+                var final = reqDates.Remove(reqDates.ToString().LastIndexOf(','), 2).ToString();
+                contractorViewModel.RequriedDates = final;
             }
-
-
 
             return View(contractorViewModel);
         }
@@ -161,7 +173,7 @@ namespace FinancialAccounting.Controllers
                 var listOfDates = contractor.RequriedDates.Split(',');
                 foreach (var date in listOfDates)
                 {
-                    var parsedDate = DateTime.ParseExact(date, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    var parsedDate = DateTime.ParseExact(date.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
                     _paymentsRepository.AddPlannedPayment(new PlannedPaymentsDate()
                     {
                         ContractorId = obj.Id,
@@ -174,6 +186,64 @@ namespace FinancialAccounting.Controllers
             return RedirectToAction("ContractorPayments", "Payments", new { @contractorId = contractor.Id });
         }
 
+        public ContractorPaymentsViewModel GetContractorData(int contractorId)
+        {
+            var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
+
+            var contractorViewModel = ToContractorPaymentsViewModel(contractorObject);
+
+            var allPayments = _paymentsRepository.GetPaymentsForContractor(contractorId).ToList();
+
+            var needToPayByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash -
+                                      allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ);
+
+            contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel()
+            {
+                NeedToPayByContract = needToPayByContract,
+                PayedByContract = allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ),
+                SummByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash
+            };
+
+            contractorViewModel.Payments = new List<PaymentViewModel>();
+
+            if (allPayments.Any())
+            {
+                var inCashNeedToPayByContract = contractorObject.TotalCostsInCash -
+                                                allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId)
+                                                    .Sum(p => p.Summ);
+
+                var inCashlessNeedToPayByContract = contractorObject.TotalCostsCashless -
+                                                    allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId)
+                                                        .Sum(p => p.Summ);
+
+                contractorViewModel.PaymentsSummary.InCashNeedToPayByContract = inCashNeedToPayByContract;
+                contractorViewModel.PaymentsSummary.InCashPayedByContract =
+                    allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
+                contractorViewModel.PaymentsSummary.InCashSummByContract = contractorObject.TotalCostsInCash;
+
+                contractorViewModel.PaymentsSummary.InCashlessNeedToPayByContract = inCashlessNeedToPayByContract;
+                contractorViewModel.PaymentsSummary.InCashlessPayedByContract =
+                    allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
+                contractorViewModel.PaymentsSummary.InCashlessSummByContract = contractorObject.TotalCostsCashless;
+
+                foreach (var payment in allPayments)
+                {
+                    contractorViewModel.Payments.Add(new PaymentViewModel
+                    {
+                        Date = payment.Date,
+                        Type = payment.IsInCash ? "Наличный" : "Безналичный",
+                        Summ = payment.Summ,
+                        Name = payment.Name,
+                        Executor = "Alex",
+                        Id = payment.Id
+                    });
+                }
+
+
+            }
+            return contractorViewModel;
+        }
+
         #region DataTransformers
 
         private BuildingViewModel ToBuildingViewModel(BuildingObject buildingObject)
@@ -183,6 +253,19 @@ namespace FinancialAccounting.Controllers
                 Id = buildingObject.Id,
                 Name = buildingObject.Name,
                 Description = buildingObject.Notes
+            };
+        }
+
+        private ContractorPaymentsViewModel ToContractorPaymentsViewModel(Contractor contractor)
+        {
+            return new ContractorPaymentsViewModel()
+            {
+                Id = contractor.Id,
+                BuildingObjectId = contractor.BuildingObjectId,
+                Name = contractor.Name,
+                Description = contractor.Description,
+                TotalCostsCashless = contractor.TotalCostsCashless,
+                TotalCostsInCash = contractor.TotalCostsInCash
             };
         }
 
