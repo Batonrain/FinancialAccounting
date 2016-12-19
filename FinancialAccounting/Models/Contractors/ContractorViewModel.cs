@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using FinancialAccounting.Models.Buildings;
 using FinancialAccounting.Models.Payments;
 
 namespace FinancialAccounting.Models.Contractors
@@ -11,9 +13,8 @@ namespace FinancialAccounting.Models.Contractors
         public string Description { get; set; }
         public decimal TotalCostsInCash { get; set; }
         public decimal TotalCostsCashless { get; set; }
-
-        public string Status { get;set }
-
+        public Status Status { get; set; }
+        public DateTime PlannedDate { get; set; }
         public List<PaymentViewModel> Payments { get; set; }
         public PaymentSummaryViewModel PaymentsSummary { get; set; }
     }

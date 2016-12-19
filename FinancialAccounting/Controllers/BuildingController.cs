@@ -239,6 +239,35 @@ namespace FinancialAccounting.Controllers
                     });
                 }
 
+                var plannedPaymentsForContractor =
+                    _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId);
+
+                if (plannedPaymentsForContractor.Any())
+                {
+                    contractorViewModel.PlannedDate = plannedPaymentsForContractor.OrderBy(pd => pd.Date).FirstOrDefault().Date;
+                    var daysLeft = (contractorViewModel.PlannedDate - DateTime.Now).TotalDays;
+
+
+                    if (daysLeft > 7)
+                    {
+                        contractorViewModel.Status = Status.Green;
+                    }
+
+                    if (daysLeft > 3 && daysLeft < 7)
+                    {
+                        contractorViewModel.Status = Status.Yellow;
+                    }
+
+                    if (daysLeft < 3)
+                    {
+                        contractorViewModel.Status = Status.Yellow;
+                    }
+                }
+                else
+                {
+                    contractorViewModel.Status = Status.White;
+                }
+
 
             }
             return contractorViewModel;

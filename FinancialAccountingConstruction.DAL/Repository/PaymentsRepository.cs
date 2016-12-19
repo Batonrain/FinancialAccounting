@@ -25,9 +25,9 @@ namespace FinancialAccountingConstruction.DAL.Repository
             _context.SaveChanges();
         }
 
-        public IEnumerable<PlannedPaymentsDate> GetPlannedPaymentsDatesByContractorId(int id)
+        public List<PlannedPaymentsDate> GetPlannedPaymentsDatesByContractorId(int id)
         {
-            return _context.PlannedPaymentsDates.Where(p => p.ContractorId == id && !p.IsPayed);
+            return _context.PlannedPaymentsDates.Where(p => p.ContractorId == id && !p.IsPayed).ToList();
         }
 
         public IEnumerable<Payment> GetPaymentsForContractor(int id)

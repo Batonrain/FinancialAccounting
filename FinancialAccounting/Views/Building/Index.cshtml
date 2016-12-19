@@ -1,4 +1,5 @@
-﻿@model FinancialAccounting.Models.Buildings.ManageBuildingViewModel
+﻿@using FinancialAccounting.Models.Buildings
+@model FinancialAccounting.Models.Buildings.ManageBuildingViewModel
 @{
     ViewBag.Title = string.Format("Управление объектом '{0}'", Model.BuildingMainInfo.Name);
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,7 +26,7 @@
 </div>
 
 <div class="row">
-    <table >
+    <table>
         <tr>
             <th style="text-align:center;">Название подрядчика</th>
             <th style="text-align:center;">Всего</th>
@@ -98,7 +99,21 @@
                     </table>
                 </td>
                 <td>
-                    <label style="background-color: red;">Статус даты платежа</label>
+                    @if (contractor.Status == Status.Green)
+                    {
+                        <label>@contractor.PlannedDate.ToShortDateString()</label>
+                    }
+                    @if (contractor.Status == Status.Yellow)
+                    {
+                        <label style="background-color: yellow;">@contractor.PlannedDate.ToShortDateString()</label>
+                    }
+                    @if (contractor.Status == Status.Red)
+                    {
+                        <label style="background-color: red;">@contractor.PlannedDate.ToShortDateString()</label>
+                    }
+                    @if (contractor.Status == Status.Green)
+                    {
+                    }
                 </td>
             </tr>
         }
