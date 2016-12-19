@@ -25,6 +25,18 @@ namespace FinancialAccountingConstruction.DAL.Repository
             _context.SaveChanges();
         }
 
+        public void UpdatePlannedPaymentToPayed(int plannedPaymentId)
+        {
+            var pp = _context.PlannedPaymentsDates.Single(p => p.Id == plannedPaymentId);
+            pp.IsPayed = true;
+
+            _context.PlannedPaymentsDates.Attach(pp);
+            var entry = _context.Entry(pp);
+            entry.Property(e => e.IsPayed).IsModified = true;
+            _context.SaveChanges();
+        }
+        
+
         public List<PlannedPaymentsDate> GetPlannedPaymentsDatesByContractorId(int id)
         {
             return _context.PlannedPaymentsDates.Where(p => p.ContractorId == id && !p.IsPayed).ToList();

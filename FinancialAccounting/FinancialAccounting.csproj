@@ -179,6 +179,7 @@
     <Compile Include="Models\Contractors\UpdateContractorViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Payments\CreatePaymentViewModel.cs" />
+    <Compile Include="Models\Payments\CreatePlannedPaymentViewModel.cs" />
     <Compile Include="Models\Payments\PaymentSummaryViewModel.cs" />
     <Compile Include="Models\Payments\PaymentViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -280,6 +281,7 @@
     <Content Include="Views\Building\UpdateContractor.cshtml" />
     <Content Include="Views\Payments\Index.cshtml" />
     <Content Include="Views\Payments\CreatePayment.cshtml" />
+    <Content Include="Views\Payments\CreatePlannedPayment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

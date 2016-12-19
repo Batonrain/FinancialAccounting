@@ -247,7 +247,6 @@ namespace FinancialAccounting.Controllers
                     contractorViewModel.PlannedDate = plannedPaymentsForContractor.OrderBy(pd => pd.Date).FirstOrDefault().Date;
                     var daysLeft = (contractorViewModel.PlannedDate - DateTime.Now).TotalDays;
 
-
                     if (daysLeft > 7)
                     {
                         contractorViewModel.Status = Status.Green;
@@ -267,7 +266,6 @@ namespace FinancialAccounting.Controllers
                 {
                     contractorViewModel.Status = Status.White;
                 }
-
 
             }
             return contractorViewModel;

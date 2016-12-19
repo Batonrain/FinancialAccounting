@@ -90,6 +90,8 @@ namespace FinancialAccounting.Controllers
             }
 
             ViewBag.Title = string.Format("Платежи подрядчика '{0}'", contractorViewModel.Name);
+            ViewBag.ShowPlannedPaymentsButton =
+                _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId).Any();
 
             return View(contractorViewModel);
         }
@@ -113,6 +115,34 @@ namespace FinancialAccounting.Controllers
             return RedirectToAction("ContractorPayments", new { @contractorId = paymentViewModel.ContractorId });
         }
 
+        public ActionResult CreatePlannedPayment(int contractorId)
+        {
+            var paymentTypes = new Dictionary<string, bool> {{"Наличные", true}, {"Безнал", false}};
+
+            var pd = _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId);
+
+            var paymentDates = pd.ToDictionary(plannedPaymentsDate => plannedPaymentsDate.Date.ToShortDateString(), plannedPaymentsDate => plannedPaymentsDate.Id);
+
+            var model = new CreatePlannedPaymentViewModel
+            {
+                ContractorId = contractorId,
+                TypesOfPayments = paymentTypes,
+                DatesOfPayments = paymentDates
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreatePlannedPayment(CreatePlannedPaymentViewModel paymentViewModel)
+        {
+            var newPayment = ToPlannedPaymentObject(paymentViewModel);
+            _paymentsRepository.AddPayment(newPayment);
+            _paymentsRepository.UpdatePlannedPaymentToPayed(paymentViewModel.PlannedPaymentId);
+
+            return RedirectToAction("ContractorPayments", new { @contractorId = paymentViewModel.ContractorId });
+        }
+
         private ContractorPaymentsViewModel ToContractorPaymentsViewModel(Contractor contractor)
         {
             return new ContractorPaymentsViewModel()
@@ -132,6 +162,19 @@ namespace FinancialAccounting.Controllers
             {
                 ContractorId = paymentViewModel.ContractorId,
                 IsInCash = true,
+                Name = paymentViewModel.Name,
+                Summ = paymentViewModel.Summ,
+                Date = DateTime.Now,
+                ExecutorId = 1
+            };
+        }
+
+        private Payment ToPlannedPaymentObject(CreatePlannedPaymentViewModel paymentViewModel)
+        {
+            return new Payment
+            {
+                ContractorId = paymentViewModel.ContractorId,
+                IsInCash = paymentViewModel.IsInCash,
                 Name = paymentViewModel.Name,
                 Summ = paymentViewModel.Summ,
                 Date = DateTime.Now,

@@ -13,6 +13,12 @@
         <h3 style="margin-left: 5px;text-align: right; float: right;">
             @Html.ActionLink("Провести платёж", "CreatePayment", "Payments", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
+        @if (ViewBag.ShowPlannedPaymentsButton)
+        {
+            <h3 style="margin-left: 5px;text-align: right; float: right;">
+                @Html.ActionLink("Провести плановый платёж", "CreatePlannedPayment", "Payments", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            </h3>
+        }
         <hr style="clear:both;" />
     </div>
 </div>
@@ -21,11 +27,11 @@
     <div class="col-md-12">
         <h3 style="text-align:left;">@ViewBag.LastUpdate</h3>
     </div>
-        <div class="col-md-12">
-            @Html.DisplayFor(m => m.Description)
-        </div>
-        <hr style="clear:both;" />
+    <div class="col-md-12">
+        @Html.DisplayFor(m => m.Description)
     </div>
+    <hr style="clear:both;" />
+</div>
 
 <div class="row">
     <div class="col-md-12">
