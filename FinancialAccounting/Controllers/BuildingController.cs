@@ -6,7 +6,6 @@ using System.Text;
 using System.Web.Mvc;
 using FinancialAccounting.Models.Buildings;
 using FinancialAccounting.Models.Contractors;
-using FinancialAccounting.Models.Contracts;
 using FinancialAccounting.Models.Payments;
 using FinancialAccountingConstruction.DAL.Models.Building;
 using FinancialAccountingConstruction.DAL.Models.Contractors;

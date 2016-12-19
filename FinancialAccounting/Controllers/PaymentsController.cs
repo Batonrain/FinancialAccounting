@@ -22,11 +22,6 @@ namespace FinancialAccounting.Controllers
             _paymentsRepository = new PaymentsRepository();
         }
 
-        public ActionResult Index(int contractorId)
-        {
-            return View();
-        }
-
         public ActionResult ContractorPayments(int contractorId)
         {
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);

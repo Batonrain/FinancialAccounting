@@ -74,27 +74,27 @@
                 <td>
                     <table style="text-align:center;">
                         <tr>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.SummByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.PayedByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.NeedToPayByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.SummByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.PayedByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.NeedToPayByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
                         </tr>
                     </table>
                 </td>
                 <td>
                     <table style="text-align:center;">
                         <tr>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashSummByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashPayedByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashNeedToPayByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashSummByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashPayedByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashNeedToPayByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
                         </tr>
                     </table>
                 </td>
                 <td>
                     <table style="text-align:center;">
                         <tr>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashlessSummByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashPayedByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashNeedToPayByContract.ToString("0000"), "Index", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashlessSummByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashPayedByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@Html.ActionLink(contractor.PaymentsSummary.InCashNeedToPayByContract.ToString("0000"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
                         </tr>
                     </table>
                 </td>
@@ -119,27 +119,35 @@
         }
         <tr>
             <td><b>Итого:</b></td>
-            <td> 517.000.00 </td>
-            <td> 614.000.00</td>
-            <td></td>
+            <td>
+                <table style="text-align:center;">
+                    <tr>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.SummByContract).ToString("0000")</td>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.PayedByContract).ToString("0000")</td>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.NeedToPayByContract).ToString("0000")</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table style="text-align:center;">
+                    <tr>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.InCashSummByContract).ToString("0000")</td>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.InCashPayedByContract).ToString("0000")</td>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.InCashNeedToPayByContract).ToString("0000")</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table style="text-align:center;">
+                    <tr>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.InCashlessSummByContract).ToString("0000")</td>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.InCashlessPayedByContract).ToString("0000")</td>
+                        <td>@Model.Contractors.Sum(c => c.PaymentsSummary.InCashlessNeedToPayByContract).ToString("0000")</td>
+                    </tr>
+                </table>
+            </td>
         </tr>
     </table>
-    <hr style="clear:both;" />
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <table>
-            <tr>
-                <td><b>Осталось заплатить:</b></td>
-                <td>11.200.000.00</td>
-            </tr>
-            <tr>
-                <td><b>Всего уплачено:</b></td>
-                <td>100.200.000.00</td>
-            </tr>
-        </table>
-    </div>
 </div>
 
 @section Scripts {
