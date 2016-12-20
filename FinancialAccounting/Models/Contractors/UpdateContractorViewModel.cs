@@ -14,7 +14,7 @@ namespace FinancialAccounting.Models.Contractors
         public string Name { get; set; }
 
         [Required]
-        [Display(Name = "Сводка по контракту")]
+        [Display(Name = "Сводка по подрядчику")]
         [StringLength(2000, ErrorMessage = "Поле 'Сводка по подрядчику' не должно быть короче 3х символов.", MinimumLength = 3)]
         public string Descriptions { get; set; }
 
