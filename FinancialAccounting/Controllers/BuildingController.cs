@@ -191,82 +191,90 @@ namespace FinancialAccounting.Controllers
 
             var contractorViewModel = ToContractorPaymentsViewModel(contractorObject);
 
-            var allPayments = _paymentsRepository.GetPaymentsForContractor(contractorId).ToList();
-
-            var needToPayByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash -
-                                      allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ);
-
-            contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel()
-            {
-                NeedToPayByContract = needToPayByContract,
-                PayedByContract = allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ),
-                SummByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash
-            };
-
+            contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel();
             contractorViewModel.Payments = new List<PaymentViewModel>();
 
-            if (allPayments.Any())
+            if (_paymentsRepository.PaymentsAreExist(contractorId))
             {
-                var inCashNeedToPayByContract = contractorObject.TotalCostsInCash -
-                                                allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId)
-                                                    .Sum(p => p.Summ);
+                var allPayments = _paymentsRepository.GetPaymentsForContractor(contractorId).ToList();
 
-                var inCashlessNeedToPayByContract = contractorObject.TotalCostsCashless -
-                                                    allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId)
+                var needToPayByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash -
+                                          allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ);
+
+                contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel()
+                {
+                    NeedToPayByContract = needToPayByContract,
+                    PayedByContract = allPayments.Where(p => p.ContractorId == contractorId).Sum(p => p.Summ),
+                    SummByContract = contractorObject.TotalCostsCashless + contractorObject.TotalCostsInCash
+                };
+
+                contractorViewModel.Payments = new List<PaymentViewModel>();
+
+                if (allPayments.Any())
+                {
+                    var inCashNeedToPayByContract = contractorObject.TotalCostsInCash -
+                                                    allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId)
                                                         .Sum(p => p.Summ);
 
-                contractorViewModel.PaymentsSummary.InCashNeedToPayByContract = inCashNeedToPayByContract;
-                contractorViewModel.PaymentsSummary.InCashPayedByContract =
-                    allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
-                contractorViewModel.PaymentsSummary.InCashSummByContract = contractorObject.TotalCostsInCash;
+                    var inCashlessNeedToPayByContract = contractorObject.TotalCostsCashless -
+                                                        allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId)
+                                                            .Sum(p => p.Summ);
 
-                contractorViewModel.PaymentsSummary.InCashlessNeedToPayByContract = inCashlessNeedToPayByContract;
-                contractorViewModel.PaymentsSummary.InCashlessPayedByContract =
-                    allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
-                contractorViewModel.PaymentsSummary.InCashlessSummByContract = contractorObject.TotalCostsCashless;
+                    contractorViewModel.PaymentsSummary.InCashNeedToPayByContract = inCashNeedToPayByContract;
+                    contractorViewModel.PaymentsSummary.InCashPayedByContract =
+                        allPayments.Where(p => p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
+                    contractorViewModel.PaymentsSummary.InCashSummByContract = contractorObject.TotalCostsInCash;
 
-                foreach (var payment in allPayments)
-                {
-                    contractorViewModel.Payments.Add(new PaymentViewModel
+                    contractorViewModel.PaymentsSummary.InCashlessNeedToPayByContract = inCashlessNeedToPayByContract;
+                    contractorViewModel.PaymentsSummary.InCashlessPayedByContract =
+                        allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
+                    contractorViewModel.PaymentsSummary.InCashlessSummByContract = contractorObject.TotalCostsCashless;
+
+                    foreach (var payment in allPayments)
                     {
-                        Date = payment.Date,
-                        Type = payment.IsInCash ? "Наличный" : "Безналичный",
-                        Summ = payment.Summ,
-                        Name = payment.Name,
-                        Executor = "Alex",
-                        Id = payment.Id
-                    });
-                }
-
-                var plannedPaymentsForContractor =
-                    _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId);
-
-                if (plannedPaymentsForContractor.Any())
-                {
-                    contractorViewModel.PlannedDate = plannedPaymentsForContractor.OrderBy(pd => pd.Date).FirstOrDefault().Date;
-                    var daysLeft = (contractorViewModel.PlannedDate - DateTime.Now).TotalDays;
-
-                    if (daysLeft > 7)
-                    {
-                        contractorViewModel.Status = Status.Green;
+                        contractorViewModel.Payments.Add(new PaymentViewModel
+                        {
+                            Date = payment.Date,
+                            Type = payment.IsInCash ? "Наличный" : "Безналичный",
+                            Summ = payment.Summ,
+                            Name = payment.Name,
+                            Executor = "Alex",
+                            Id = payment.Id
+                        });
                     }
 
-                    if (daysLeft > 3 && daysLeft < 7)
+                    var plannedPaymentsForContractor =
+                        _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId);
+
+                    if (plannedPaymentsForContractor.Any())
                     {
-                        contractorViewModel.Status = Status.Yellow;
+                        contractorViewModel.PlannedDate = plannedPaymentsForContractor.OrderBy(pd => pd.Date).FirstOrDefault().Date;
+                        var daysLeft = (contractorViewModel.PlannedDate - DateTime.Now).TotalDays;
+
+                        if (daysLeft > 7)
+                        {
+                            contractorViewModel.Status = Status.Green;
+                        }
+
+                        if (daysLeft > 3 && daysLeft < 7)
+                        {
+                            contractorViewModel.Status = Status.Yellow;
+                        }
+
+                        if (daysLeft < 3)
+                        {
+                            contractorViewModel.Status = Status.Yellow;
+                        }
+                    }
+                    else
+                    {
+                        contractorViewModel.Status = Status.White;
                     }
 
-                    if (daysLeft < 3)
-                    {
-                        contractorViewModel.Status = Status.Yellow;
-                    }
                 }
-                else
-                {
-                    contractorViewModel.Status = Status.White;
-                }
-
             }
+
+
             return contractorViewModel;
         }
 

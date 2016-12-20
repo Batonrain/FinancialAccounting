@@ -50,9 +50,9 @@
                             <th style="text-align: center;">Осталось оплатить</th>
                         </tr>
                         <tr>
-                            <td style="text-align: center;">@Model.PaymentsSummary.SummByContract</td>
-                            <td style="text-align: center;">@Model.PaymentsSummary.PayedByContract</td>
-                            <td style="text-align: center;">@Model.PaymentsSummary.NeedToPayByContract</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.SummByContract.ToString("C0")</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.PayedByContract.ToString("C0")</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.NeedToPayByContract.ToString("C0")</td>
                         </tr>
                     </table>
                 </td>
@@ -64,9 +64,9 @@
                             <th style="text-align: center;">Осталось оплатить</th>
                         </tr>
                         <tr>
-                            <td style="text-align: center;">@Model.PaymentsSummary.InCashlessSummByContract</td>
-                            <td style="text-align: center;">@Model.PaymentsSummary.InCashlessPayedByContract</td>
-                            <td style="text-align: center;">@Model.PaymentsSummary.InCashlessNeedToPayByContract</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.InCashlessSummByContract.ToString("C0")</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.InCashlessPayedByContract.ToString("C0")</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.InCashlessNeedToPayByContract.ToString("C0")</td>
                         </tr>
                     </table>
                 </td>
@@ -78,9 +78,9 @@
                             <th style="text-align: center;">Осталось оплатить</th>
                         </tr>
                         <tr>
-                            <td style="text-align: center;">@Model.PaymentsSummary.InCashSummByContract</td>
-                            <td style="text-align: center;">@Model.PaymentsSummary.InCashPayedByContract</td>
-                            <td style="text-align: center;">@Model.PaymentsSummary.InCashNeedToPayByContract</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.InCashSummByContract.ToString("C0")</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.InCashPayedByContract.ToString("C0")</td>
+                            <td style="text-align: center;">@Model.PaymentsSummary.InCashNeedToPayByContract.ToString("C0")</td>
                         </tr>
                     </table>
                 </td>

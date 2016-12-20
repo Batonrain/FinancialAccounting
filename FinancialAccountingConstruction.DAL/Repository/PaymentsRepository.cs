@@ -46,10 +46,9 @@ namespace FinancialAccountingConstruction.DAL.Repository
             return _context.Payments.Where(p => p.ContractorId == id);
         }
 
-        public void Remove(PlannedPaymentsDate date)
+        public bool PaymentsAreExist(int id)
         {
-            _context.PlannedPaymentsDates.Remove(date);
-            _context.SaveChanges();
+            return _context.Payments.Any(p => p.ContractorId == id);
         }
 
         public void RemoveAllForContractor(int id)
