@@ -20,7 +20,7 @@
                 @Html.ActionLink("Учёт строительства", "Index", "Home", null, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                @if (Request.IsAuthenticated)
+                @if (Request.IsAuthenticated && User.IsInRole("Admin"))
                 {
                     <ul class="nav navbar-nav">
                         <li>@Html.ActionLink("Управление пользователями", "ManageAccounts", "Account")</li>

@@ -22,11 +22,13 @@ namespace FinancialAccounting.Controllers
             _paymentsRepository = new PaymentsRepository();
         }
 
-        public ActionResult ContractorPayments(int contractorId)
+        public ActionResult ContractorPayments(int contractorId, bool type)
         {
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
 
             var contractorViewModel = ToContractorPaymentsViewModel(contractorObject);
+            contractorViewModel.TypeText = type ? "Безналичная оплата" : "Наличная оплата";
+            contractorViewModel.Type = type;
 
             contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel();
             contractorViewModel.Payments = new List<PaymentViewModel>();
@@ -68,15 +70,14 @@ namespace FinancialAccounting.Controllers
                         allPayments.Where(p => !p.IsInCash && p.ContractorId == contractorId).Sum(p => p.Summ);
                     contractorViewModel.PaymentsSummary.InCashlessSummByContract = contractorObject.TotalCostsCashless;
 
-                    foreach (var payment in allPayments)
+                    foreach (var payment in allPayments.Where(p => p.IsInCash == type))
                     {
                         contractorViewModel.Payments.Add(new PaymentViewModel
                         {
                             Date = payment.Date,
-                            Type = payment.IsInCash ? "Наличный" : "Безналичный",
                             Summ = payment.Summ,
                             Name = payment.Name,
-                            Executor = "Alex",
+                            Executor = User.Identity.Name,
                             Id = payment.Id
                         });
                     }
@@ -92,8 +93,10 @@ namespace FinancialAccounting.Controllers
 
                 ViewBag.Title = string.Format("Платежи подрядчика '{0}'", contractorViewModel.Name);
             }
+
             ViewBag.ShowPlannedPaymentsButton =
                     _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId).Any();
+
             return View(contractorViewModel);
         }
 
@@ -101,7 +104,8 @@ namespace FinancialAccounting.Controllers
         {
             var model = new CreatePaymentViewModel
             {
-                ContractorId = contractorId
+                ContractorId = contractorId,
+                TypesOfPayments = CreatePaymentDictionary()
             };
             return View(model);
         }
@@ -111,6 +115,7 @@ namespace FinancialAccounting.Controllers
         public ActionResult CreatePayment(CreatePaymentViewModel paymentViewModel)
         {
             var newPayment = ToPaymentObject(paymentViewModel);
+
             _paymentsRepository.AddPayment(newPayment);
 
             return RedirectToAction("ContractorPayments", new { @contractorId = paymentViewModel.ContractorId });
@@ -118,8 +123,6 @@ namespace FinancialAccounting.Controllers
 
         public ActionResult CreatePlannedPayment(int contractorId)
         {
-            var paymentTypes = new Dictionary<string, bool> { { "Наличные", true }, { "Безнал", false } };
-
             var pd = _paymentsRepository.GetPlannedPaymentsDatesByContractorId(contractorId);
 
             var paymentDates = pd.ToDictionary(plannedPaymentsDate => plannedPaymentsDate.Date.ToShortDateString(), plannedPaymentsDate => plannedPaymentsDate.Id);
@@ -127,7 +130,7 @@ namespace FinancialAccounting.Controllers
             var model = new CreatePlannedPaymentViewModel
             {
                 ContractorId = contractorId,
-                TypesOfPayments = paymentTypes,
+                TypesOfPayments = CreatePaymentDictionary(),
                 DatesOfPayments = paymentDates
             };
             return View(model);
@@ -181,6 +184,29 @@ namespace FinancialAccounting.Controllers
                 Date = DateTime.Now,
                 ExecutorId = 1
             };
+        }
+
+        private Dictionary<string, bool> CreatePaymentDictionary()
+        {
+            var result = new Dictionary<string, bool>();
+
+            if (User.IsInRole("Admin"))
+            {
+                result.Add("Наличные", true);
+                result.Add("Безнал", false);
+            }
+
+            if (User.IsInRole("CashAccounting"))
+            {
+                result.Add("Наличные", true);
+            }
+
+            if (User.IsInRole("NonCashAccounting"))
+            {
+                result.Add("Безнал", true);
+            }
+
+            return result;
         }
     }
 }

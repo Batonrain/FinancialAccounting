@@ -13,6 +13,8 @@ namespace FinancialAccounting.Models.Contractors
         public string Description { get; set; }
         public decimal TotalCostsInCash { get; set; }
         public decimal TotalCostsCashless { get; set; }
+        public bool Type { get; set; }
+        public string TypeText { get; set; }
         public Status Status { get; set; }
         public DateTime PlannedDate { get; set; }
         public List<PaymentViewModel> Payments { get; set; }

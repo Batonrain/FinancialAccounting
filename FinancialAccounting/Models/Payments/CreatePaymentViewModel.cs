@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FinancialAccounting.Models.Payments
 {
@@ -11,6 +12,12 @@ namespace FinancialAccounting.Models.Payments
         [Required]
         [Display(Name = "Сумма платежа в рублях")]
         public decimal Summ { get; set; }
+
+        [Required]
+        [Display(Name = "Тип платежа")]
+        public bool IsInCash { get; set; }
+
+        public Dictionary<string, bool> TypesOfPayments { get; set; }
         public int ContractorId { get; set; }
     }
 }

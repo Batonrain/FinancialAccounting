@@ -8,12 +8,15 @@
 <div class="row">
     <div class="col-md-12">
         <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
-        <h3 style="margin-left: 5px;text-align: right; float: right;">
-            @Html.ActionLink("Редактировать описание объекта", "UpdateObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
-        </h3>
-        <h3 style="margin-left:5px;text-align:right;float:right;">
-            @Html.ActionLink("Добавить подрядчика", "CreateContractorForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
-        </h3>
+        @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting") || User.IsInRole("NonCashAccounting"))
+        {
+            <h3 style="margin-left: 5px;text-align: right; float: right;">
+                @Html.ActionLink("Редактировать описание объекта", "UpdateObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            </h3>
+            <h3 style="margin-left:5px;text-align:right;float:right;">
+                @Html.ActionLink("Добавить подрядчика", "CreateContractorForObject", "Building", routeValues: new { @buildingId = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            </h3>
+        }
         <hr style="clear:both;" />
     </div>
 </div>
@@ -30,8 +33,18 @@
         <tr>
             <th style="text-align:center;">Название подрядчика</th>
             <th style="text-align:center;">Всего по договору</th>
-            <th style="text-align:center;">Наличные рассчёты</th>
-            <th style="text-align:center;">Безналичные рассчёты</th>
+            <th style="text-align:center;">
+                @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
+                {
+                    <b>Наличные рассчёты</b>
+                }
+            </th>
+            <th style="text-align:center;">
+                @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
+                {
+                    <b>Безналичные рассчёты</b>
+                }
+            </th>
             <th style="text-align:center;">Дата платежа</th>
         </tr>
         <tr>
@@ -45,34 +58,36 @@
                     </tr>
                 </table>
             </td>
-            <td>
-               
-            </td>
-            <td>
-               
-            </td>
+            <td></td>
+            <td></td>
             <td></td>
         </tr>
         @foreach (var contractor in @Model.Contractors)
         {
             <tr style="border-collapse: separate; border-spacing: 0 5px;">
-                <td style ="text-align:center;">
-                    @Html.ActionLink(contractor.Name, "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                <td style="text-align:center;">
+                    @contractor.Name
                 </td>
                 <td>
                     <table style="text-align:center;">
                         <tr>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.SummByContract.ToString("C0"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.PayedByContract.ToString("C0"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
-                            <td>@Html.ActionLink(contractor.PaymentsSummary.NeedToPayByContract.ToString("C0"), "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                            <td>@contractor.PaymentsSummary.SummByContract.ToString("C0")</td>
+                            <td>@contractor.PaymentsSummary.PayedByContract.ToString("C0")</td>
+                            <td>@contractor.PaymentsSummary.NeedToPayByContract.ToString("C0")</td>
                         </tr>
                     </table>
                 </td>
                 <td style="text-align:center;">
-                    Платежи
+                    @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
+                    {
+                        @Html.ActionLink("Платежи", "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id, @type = false }, htmlAttributes: new { @class = "btn btn-primary" })
+                    }
                 </td>
                 <td style="text-align:center;">
-                    Платежи
+                    @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
+                    {
+                        @Html.ActionLink("Платежи", "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id, @type = true }, htmlAttributes: new { @class = "btn btn-primary" })
+                    }
                 </td>
                 <td style="text-align:center;">
                     @if (contractor.Status == Status.Green)
@@ -104,12 +119,8 @@
                     </tr>
                 </table>
             </td>
-            <td>
-               
-            </td>
-            <td>
-                
-            </td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
 </div>
