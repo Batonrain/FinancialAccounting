@@ -5,19 +5,16 @@ using FinancialAccounting.Models.Payments;
 
 namespace FinancialAccounting.Models.Contractors
 {
-    public class ContractorPaymentsViewModel
+    public class ContractorViewModel
     {
         public int Id { get; set; }
         public int BuildingObjectId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public decimal TotalCostsInCash { get; set; }
-        public decimal TotalCostsCashless { get; set; }
-        public bool Type { get; set; }
+        public bool IsInCahs { get; set; }
         public string TypeText { get; set; }
         public Status Status { get; set; }
-        public DateTime PlannedDate { get; set; }
-        public List<PaymentViewModel> Payments { get; set; }
+        public List<StageViewModel> Stages { get; set; }
         public PaymentSummaryViewModel PaymentsSummary { get; set; }
     }
 }

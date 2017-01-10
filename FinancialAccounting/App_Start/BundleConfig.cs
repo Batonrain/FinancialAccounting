@@ -14,12 +14,11 @@ namespace FinancialAccounting
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
-            bundles.Add(new ScriptBundle("~/bundles/datepicker").Include(
-                        "~/Scripts/multidatespicker.js",
-                        "~/Scripts/contractCreation.js"));
+            bundles.Add(new ScriptBundle("~/bundles/dialog").Include(
+                        "~/Scripts/paymentDialog.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/datepickerToSet").Include(
-                        "~/Scripts/multidatespicker.js"));
+            bundles.Add(new ScriptBundle("~/bundles/datepicker").Include(
+                        "~/Scripts/stageCreation.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.

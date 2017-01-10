@@ -32,24 +32,12 @@
                     @Html.TextAreaFor(m => m.Descriptions, new { @class = "form-control" })
                 </div>
             </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.TotalCostsInCash, new { @class = "col-md-2 control-label" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(m => m.TotalCostsInCash, new { @class = "form-control" })
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.TotalCostsCashless, new { @class = "col-md-2 control-label" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(m => m.TotalCostsCashless, new { @class = "form-control" })
-                </div>
-            </div>
-            <div class="form-group">
+            @*<div class="form-group">
                 @Html.LabelFor(m => m.RequriedDates, new { @class = "col-md-2 control-label" })
                 <div class="col-md-10">
                     @Html.TextBoxFor(m => m.RequriedDates, new { @class = "form-control", @id = "simplestUsage" })
                 </div>
-            </div>
+            </div>*@
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
                     <input type="submit" value="Сохранить изменения" class="btn btn-default" />

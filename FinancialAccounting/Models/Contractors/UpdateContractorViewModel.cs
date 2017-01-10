@@ -17,18 +17,5 @@ namespace FinancialAccounting.Models.Contractors
         [Display(Name = "Сводка по подрядчику")]
         [StringLength(2000, ErrorMessage = "Поле 'Сводка по подрядчику' не должно быть короче 3х символов.", MinimumLength = 3)]
         public string Descriptions { get; set; }
-
-        [Required]
-        [Display(Name = "Оплата в наличных")]
-        [DisplayFormat(DataFormatString = "{0:n}", ApplyFormatInEditMode = true)]
-        public decimal TotalCostsInCash { get; set; }
-
-        [Required]
-        [Display(Name = "Оплата безналом")]
-        [DisplayFormat(DataFormatString = "{0:n}", ApplyFormatInEditMode = true)]
-        public decimal TotalCostsCashless { get; set; }
-
-        [Display(Name = "Даты обязательных платежей")]
-        public string RequriedDates { get; set; }
     }
 }

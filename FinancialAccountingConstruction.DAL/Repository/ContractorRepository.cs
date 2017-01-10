@@ -26,8 +26,6 @@ namespace FinancialAccountingConstruction.DAL.Repository
             var entry = _context.Entry(contract);
             entry.Property(e => e.Name).IsModified = true;
             entry.Property(e => e.Description).IsModified = true;
-            entry.Property(e => e.TotalCostsInCash).IsModified = true;
-            entry.Property(e => e.TotalCostsCashless).IsModified = true;
             _context.SaveChanges();
         }
 

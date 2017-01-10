@@ -1,5 +1,5 @@
 ﻿@using FinancialAccounting.Models.Buildings
-@model FinancialAccounting.Models.Buildings.ManageBuildingViewModel
+@model ManageBuildingViewModel
 @{
     ViewBag.Title = string.Format("Управление объектом '{0}'", Model.BuildingMainInfo.Name);
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -36,13 +36,13 @@
             <th style="text-align:center;">
                 @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
                 {
-                    <b>Наличные рассчёты</b>
+                    <b>Этапы(Наличные)</b>
                 }
             </th>
             <th style="text-align:center;">
                 @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
                 {
-                    <b>Безналичные рассчёты</b>
+                    <b>Этапы(Безналичные)</b>
                 }
             </th>
             <th style="text-align:center;">Дата платежа</th>
@@ -80,17 +80,17 @@
                 <td style="text-align:center;">
                     @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
                     {
-                        @Html.ActionLink("Платежи", "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id, @type = false }, htmlAttributes: new { @class = "btn btn-primary" })
+                        @Html.ActionLink("Платежи", "ContractorStages", "Stages", routeValues: new { @contractorId = contractor.Id, @type = true }, htmlAttributes: new { @class = "btn btn-primary" })
                     }
                 </td>
                 <td style="text-align:center;">
                     @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
                     {
-                        @Html.ActionLink("Платежи", "ContractorPayments", "Payments", routeValues: new { @contractorId = contractor.Id, @type = true }, htmlAttributes: new { @class = "btn btn-primary" })
+                        @Html.ActionLink("Платежи", "ContractorStages", "Stages", routeValues: new { @contractorId = contractor.Id, @type = false }, htmlAttributes: new { @class = "btn btn-primary" })
                     }
                 </td>
                 <td style="text-align:center;">
-                    @if (contractor.Status == Status.Green)
+                    @*@if (contractor.Status == Status.Green)
                     {
                         <label>@contractor.PlannedDate.ToShortDateString()</label>
                     }
@@ -104,7 +104,7 @@
                     }
                     @if (contractor.Status == Status.Green)
                     {
-                    }
+                    }*@
                 </td>
             </tr>
         }

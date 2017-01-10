@@ -50,8 +50,7 @@
     <Compile Include="FinancialAccountingDbContext.cs" />
     <Compile Include="Models\Building\BuildingObject.cs" />
     <Compile Include="Models\Contractors\Contractor.cs" />
-    <Compile Include="Models\Payments\Payment.cs" />
-    <Compile Include="Models\Payments\PlannedPaymentsDate.cs" />
+    <Compile Include="Models\Stages\Stage.cs" />
     <Compile Include="Models\Users\UserRoles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BuildingObjectRepository.cs" />
