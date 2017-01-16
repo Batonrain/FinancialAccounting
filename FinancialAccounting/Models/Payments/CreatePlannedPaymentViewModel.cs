@@ -1,30 +1,11 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace FinancialAccounting.Models.Payments
+﻿namespace FinancialAccounting.Models.Payments
 {
-    public class CreatePlannedPaymentViewModel
+    public class PaymentViewModel
     {
-        public int ContractorId { get; set; }
+        public int StageId { get; set; }
 
-        [Required]
-        [Display(Name = "Название платежа")]
-        public string Name { get; set; }
+        public string PaymentSum { get; set; }
 
-        [Required]
-        [Display(Name = "Сумма платежа в рублях")]
-        public decimal Summ { get; set; }
-
-        [Required]
-        [Display(Name = "Тип платежа")]
-        public bool IsInCash { get; set; }
-
-        public Dictionary<string, bool> TypesOfPayments { get; set; }
-
-        [Required]
-        [Display(Name = "Число оплаты")]
-        public int PlannedPaymentId { get; set; }
-
-        public Dictionary<string, int> DatesOfPayments { get; set; }
+        public int PaymentType { get; set; }
     }
 }

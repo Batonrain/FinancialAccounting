@@ -13,15 +13,15 @@ namespace FinancialAccountingConstruction.DAL.Repository
             _context = new FinancialAccountingDbContext();
         }
 
-        public List<Stage> GetStages(int contractorId, bool isInCash)
+        public IEnumerable<Stage> GetStages(int contractorId, bool isInCash)
         {
-            return _context.Stages.Where(c => c.ContractorId == contractorId && c.IsInCash == isInCash).ToList();
+            return _context.Stages.Where(c => c.ContractorId == contractorId && c.IsInCash == isInCash);
         }
 
-        public void AddPayment()
+        public void AddStage(Stage stage)
         {
-            //_context.PlannedPaymentsDates.Add(date);
-            //_context.SaveChanges();
+            _context.Stages.Add(stage);
+            _context.SaveChanges();
         }
     }
 }
