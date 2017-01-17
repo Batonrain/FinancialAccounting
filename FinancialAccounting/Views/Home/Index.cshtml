@@ -1,9 +1,21 @@
 ﻿@using FinancialAccounting.Models.Buildings
 
-@model List<FinancialAccounting.Models.Buildings.BuildingListItem>
+@model List<BuildingListItem>
 @{
     ViewBag.Title = "Выбор объекта";
 }
+
+<div class="row">
+    <div class="col-md-12">     
+        @if (User.IsInRole("Admin"))
+        {
+            <h3 style="margin-left: 5px;text-align: right; float: right;">
+                @Html.ActionLink("Создать новый объект", "CreateObject", "Building")
+            </h3>
+        }
+        <hr style="clear:both;" />
+    </div>
+</div>
 
 <div class="jumbotron">
     @BuildingList(Model)

@@ -16,6 +16,8 @@ namespace FinancialAccountingConstruction.DAL.Models.Stages
 
         public DateTime DateOfFinalPayment { get; set; }
 
+        public DateTime DateOfActualisation { get; set; }
+
         public decimal Prepayment { get; set; }
 
         public decimal FinalPayment { get; set; }

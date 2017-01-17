@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web.Mvc;
 using FinancialAccounting.Models.Buildings;
 using FinancialAccounting.Models.Contractors;
@@ -42,6 +39,12 @@ namespace FinancialAccounting.Controllers
                 foreach (var contractorId in contractorsId)
                 {
                     model.Contractors.Add(GetContractorData(contractorId));
+                }
+
+                if (model.Contractors.Count != 0)
+                {
+                    model.ActualizationDate = model.Contractors.Max(c => c.ActualisationDate).ToString("d");
+                    model.TotalPayment = GetTotalSummByContract(contractorsId);
                 }
 
                 return View(model);
@@ -113,7 +116,9 @@ namespace FinancialAccounting.Controllers
         {
             if (ModelState.IsValid)
             {
-                var contractorModel = ToContractorModel(contractor);              
+                var contractorModel = ToContractorModel(contractor);
+
+                _contractorsRepository.AddContractor(contractorModel);
 
                 return RedirectToAction("Index", new { @id = contractor.BuildingObjectId });
             }
@@ -124,20 +129,8 @@ namespace FinancialAccounting.Controllers
         public ActionResult UpdateContractor(int contractorId)
         {
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
-            //var requieredDates = _stagesRepository.GetPlannedPaymentsDatesByContractorId(contractorId).ToList();
+            
             var contractorViewModel = ToUpdateContractorViewModel(contractorObject);
-
-            var reqDates = new StringBuilder();
-            //if (requieredDates.Any())
-            //{
-            //    foreach (var date in requieredDates)
-            //    {
-            //        var dateToFormat = String.Format("{0:MM/dd/yyyy}", date.Date).Replace('.', '/');
-            //        reqDates = reqDates.AppendFormat("{0}, ", dateToFormat);
-            //    }
-            //    var final = reqDates.Remove(reqDates.ToString().LastIndexOf(','), 2).ToString();
-            //    contractorViewModel.RequriedDates = final;
-            //}
 
             return View(contractorViewModel);
         }
@@ -157,11 +150,45 @@ namespace FinancialAccounting.Controllers
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
 
             var contractorViewModel = ToContractorPaymentsViewModel(contractorObject);
+            var allStages = _stagesRepository.GetAllStages(contractorId).ToList();
 
-            contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel();
+            contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel
+            {
+                SummByContract = allStages.Sum(s => s.TotalPayment).ToString("C0"),
+                PayedByContract = (allStages.Sum(s => s.TotalPayment) - allStages.Sum(s => s.Prepayment + s.FinalPayment)).ToString("C0"),
+                NeedToPayByContract = allStages.Sum(s => s.Prepayment + s.FinalPayment).ToString("C0")
+            };
 
+            if (allStages.Count == 0)
+                return contractorViewModel;
+
+            contractorViewModel.ActualisationDate = allStages.Max(s => s.DateOfActualisation);
 
             return contractorViewModel;
+        }
+
+        public TotalPaymentViewModel GetTotalSummByContract(IEnumerable<int> contractorIds)
+        {
+            decimal summByContract = 0;
+            decimal payedByContract = 0;
+            decimal needToPayByContract = 0;
+
+            foreach (var allStages in contractorIds.Select(contractorId => _stagesRepository.GetAllStages(contractorId).ToList()))
+            {
+                summByContract = summByContract + allStages.Sum(s => s.TotalPayment);
+
+                payedByContract = payedByContract + (allStages.Sum(s => s.TotalPayment) -
+                                                     allStages.Sum(s => s.Prepayment + s.FinalPayment));
+
+                needToPayByContract = needToPayByContract + allStages.Sum(s => s.Prepayment + s.FinalPayment);
+            }
+
+            return new TotalPaymentViewModel
+            {
+                SummByContract = summByContract.ToString("C0"),
+                PayedByContract = payedByContract.ToString("C0"),
+                NeedToPayByContract = needToPayByContract.ToString("C0")
+            };
         }
 
         #region DataTransformers
@@ -226,9 +253,6 @@ namespace FinancialAccounting.Controllers
                 Name = contractorViewModel.Name,
                 Description = contractorViewModel.Descriptions,
                 BuildingObjectId = contractorViewModel.BuildingObjectId
-                //,
-                //TotalCostsCashless = Convert.ToDecimal(contractorViewModel.TotalCostsCashless),
-                //TotalCostsInCash = Convert.ToDecimal(contractorViewModel.TotalCostsInCash)
             };
         }
 

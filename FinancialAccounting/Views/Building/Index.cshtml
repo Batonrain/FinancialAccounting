@@ -29,7 +29,7 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        Дата актуализации: 12.12.2016
+        Дата актуализации: @Model.ActualizationDate
     </div>
     <div class="col-md-12">
         Актуализировал: superuser
@@ -54,7 +54,6 @@
                     <b>Этапы(Безналичные)</b>
                 }
             </th>
-            <th style="text-align:center;">Дата платежа</th>
         </tr>
         <tr>
             <td></td>
@@ -73,16 +72,16 @@
         </tr>
         @foreach (var contractor in @Model.Contractors)
         {
-            <tr style="border-collapse: separate; border-spacing: 0 5px;">
+            <tr style="border-collapse: separate; border-spacing: 0 5px; border-bottom: 2px solid black;">
                 <td style="text-align:center;">
                     @contractor.Name
                 </td>
-                <td>
+                <td style="text-align:center;">
                     <table style="text-align:center;">
                         <tr>
-                            <td>@contractor.PaymentsSummary.SummByContract</td>
-                            <td>@contractor.PaymentsSummary.PayedByContract</td>
-                            <td>@contractor.PaymentsSummary.NeedToPayByContract</td>
+                            <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.SummByContract</td>
+                            <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.PayedByContract</td>
+                            <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.NeedToPayByContract</td>
                         </tr>
                     </table>
                 </td>
@@ -98,23 +97,6 @@
                         @Html.ActionLink("Платежи", "ContractorStages", "Stages", routeValues: new { @contractorId = contractor.Id, @isInCash = false }, htmlAttributes: new { @class = "btn btn-primary" })
                     }
                 </td>
-                <td style="text-align:center;">
-                    @*@if (contractor.Status == Status.Green)
-                    {
-                        <label>@contractor.PlannedDate.ToShortDateString()</label>
-                    }
-                    @if (contractor.Status == Status.Yellow)
-                    {
-                        <label style="background-color: yellow;">@contractor.PlannedDate.ToShortDateString()</label>
-                    }
-                    @if (contractor.Status == Status.Red)
-                    {
-                        <label style="background-color: red;">@contractor.PlannedDate.ToShortDateString()</label>
-                    }
-                    @if (contractor.Status == Status.Green)
-                    {
-                    }*@
-                </td>
             </tr>
         }
         <tr>
@@ -122,9 +104,9 @@
             <td>
                 <table style="text-align:center;">
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td style="text-align: center; width: 33%;">@Model.TotalPayment.SummByContract</td>
+                        <td style="text-align: center; width: 33%;">@Model.TotalPayment.PayedByContract</td>
+                        <td style="text-align: center; width: 33%;">@Model.TotalPayment.NeedToPayByContract</td>
                     </tr>
                 </table>
             </td>

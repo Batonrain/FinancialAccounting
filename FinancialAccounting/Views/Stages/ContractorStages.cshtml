@@ -1,0 +1,182 @@
+﻿@using FinancialAccounting.Models.Buildings
+@model FinancialAccounting.Models.Contractors.ContractorViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/dialog")
+}
+
+<style>
+    label, input {
+        display: block;
+    }
+
+        input.text {
+            margin-bottom: 12px;
+            width: 95%;
+            padding: .4em;
+        }
+
+    fieldset {
+        padding: 0;
+        border: 0;
+        margin-top: 25px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+        margin: .6em 0;
+    }
+
+
+    .ui-dialog .ui-state-error {
+        padding: .3em;
+    }
+
+
+    fieldset {
+        border: 0;
+    }
+
+    label {
+        display: block;
+        margin: 30px 0 0 0;
+    }
+
+    .overflow {
+        height: 200px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
+        @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting") || User.IsInRole("NonCashAccounting"))
+        {
+            <h3 style="margin-left: 5px;text-align: right; float: right;">
+                @Html.ActionLink("Обновить подрядчика", "UpdateContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            </h3>
+            <h3 style="margin-left: 5px;text-align: right; float: right;">
+                @Html.ActionLink("Добавить этап", "CreateStage", "Stages", routeValues: new { @contractorId = Model.Id, isInCash = Model.IsInCahs }, htmlAttributes: new { @class = "btn btn-primary" })
+            </h3>
+        }
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="text-align:left;">@ViewBag.LastUpdate</h3>
+    </div>
+
+    <div class="col-md-12">
+        @Html.DisplayFor(m => m.Description)
+    </div>
+    <hr style="clear:both;" />
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        @Html.DisplayFor(m => m.TypeText)
+    </div>
+    <div class="col-md-12">
+        Дата актуализации: @Model.ActualisationDate.ToString("d")
+    </div>
+    <div class="col-md-12">
+        Актуализировано: superuser
+    </div>
+    <hr style="clear:both;" />
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table>
+            <tr>
+                <th style="text-align: center;">Сумма по договору</th>
+                <th style="text-align: center;">Оплачено по договору</th>
+                <th style="text-align: center;">Осталось оплатить</th>
+            </tr>
+            <tr>
+                <td style="text-align: center;">@Model.PaymentsSummary.SummByContract</td>
+                <td style="text-align: center;">@Model.PaymentsSummary.PayedByContract</td>
+                <td style="text-align: center;">@Model.PaymentsSummary.NeedToPayByContract</td>
+            </tr>
+        </table>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table>
+            <tr>
+                <th style="text-align: center; width: 30%;">Наименование работ</th>
+                <th style="text-align: center; width: 10%;">Дата выполнения работ по договору</th>
+                <th style="text-align: center;">Аванс</th>
+                <th style="text-align: center;">Дата аванса</th>
+                <th style="text-align: center;">Окончательный платеж</th>
+                <th style="text-align: center;">Дата окончательного платежа</th>
+                <th style="text-align: center;">Стоимость работ</th>
+                <th style="text-align: center; width: 10%;">Статус оплаты</th>
+                <th style="text-align: center;"></th>
+                <th style="text-align: center;"></th>
+            </tr>
+            @foreach (var stage in Model.Stages)
+            {
+                <tr style="border-bottom: 2px solid black;">
+                    <td style="text-align: center; width: 20%;">@stage.Name</td>
+                    <td style="text-align: center; width: 5%;">@stage.DateOfEnding</td>
+                    <td style="text-align: center;">@stage.Prepayment</td>
+                    <td style="text-align: center;">@stage.DateOfPrepayment</td>
+                    <td style="text-align: center;">@stage.FinalPayment</td>
+                    <td style="text-align: center;">@stage.DateOfFinalPayment</td>
+                    <td style="text-align: center;">@stage.SummOfPayment</td>
+                    @if (stage.Status == Status.Red)
+                    {
+                        <td style="text-align: center; background-color: red;">Меньше 3 дней до оплаты</td>
+                    }
+                    @if (stage.Status == Status.Yellow)
+                    {
+                        <td style="text-align: center; background-color: yellow;">Меньше 7 дней до оплаты</td>
+                    }
+                    @if (stage.Status == Status.Green)
+                    {
+                        <td style="text-align: center; background-color: green;">Меньше 10 дней до оплаты</td>
+                    }
+                    @if (stage.Status == Status.White)
+                    {
+                        <td style="text-align: center;"></td>
+                    }
+                    <td style="text-align: center;"><button name="createPayment" data-stageid="@stage.Id">Оплатить</button></td>
+                    <td style="text-align: center;"></td>
+                </tr>
+            }
+        </table>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div id="dialog-form" title="Провести платёж">
+    <p class="validateTips">Все поля обязательны к заполнению.</p>
+    <form>
+        <fieldset>
+            <label for="Summ">Сумма</label>
+            <input type="text" name="Summ" id="Summ" class="text ui-widget-content ui-corner-all">
+            <label for="PaymentType">Тип платежа</label>
+            <select name="PaymentType" id="PaymentType">
+                <option value="1">Окончательный платёж</option>
+                <option value="2">Аванс</option>
+            </select>
+
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </fieldset>
+    </form>
+</div>
