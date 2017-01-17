@@ -2,8 +2,8 @@
 {
     public class PaymentSummaryViewModel
     {
-        public decimal SummByContract { get; set; }
-        public decimal PayedByContract { get; set; }
-        public decimal NeedToPayByContract { get; set; }
+        public string SummByContract { get; set; }
+        public string PayedByContract { get; set; }
+        public string NeedToPayByContract { get; set; }
     }
 }

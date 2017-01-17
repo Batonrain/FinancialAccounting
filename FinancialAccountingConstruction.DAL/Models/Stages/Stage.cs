@@ -20,6 +20,8 @@ namespace FinancialAccountingConstruction.DAL.Models.Stages
 
         public decimal FinalPayment { get; set; }
 
+        public decimal TotalPayment { get; set; }
+
         public bool IsInCash { get; set; }
     }
 }

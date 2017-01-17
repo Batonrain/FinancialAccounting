@@ -25,7 +25,7 @@
         addPayment();
     });
 
-    $("#create-payment").button().on("click", function () {
+    $("button[name='createPayment']").button().on("click", function () {
         dialog.dialog("open");
         stageId = $(this).data('stageid');
     });
@@ -46,8 +46,7 @@
                 alert('Error: ' + xhr.statusText);
             },
             success: function () {
-                dialog.dialog("close");
-                //reload page
+                location.reload();
             },
             async: true,
             processData: false
