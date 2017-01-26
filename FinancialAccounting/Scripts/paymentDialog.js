@@ -37,7 +37,7 @@
             PaymentType: $("#PaymentType").val()
         };
         $.ajax({
-            url: '/Stages/AddPayment',
+            url: globalVarUrl,
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',

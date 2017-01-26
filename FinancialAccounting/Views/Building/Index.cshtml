@@ -37,84 +37,88 @@
     <hr style="clear:both;" />
 </div>
 
-<div class="row">
-    <table>
-        <tr>
-            <th style="text-align:center;">Название подрядчика</th>
-            <th style="text-align:center;">Всего по договору</th>
-            <th style="text-align:center;">
-                @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
-                {
-                    <b>Этапы(Наличные)</b>
-                }
-            </th>
-            <th style="text-align:center;">
-                @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
-                {
-                    <b>Этапы(Безналичные)</b>
-                }
-            </th>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <table style="text-align:center;">
-                    <tr>
-                        <td style="width: 33%; font-weight: bold;">Всего по договору</td>
-                        <td style="width: 33%; font-weight: bold;">Оплачено</td>
-                        <td style="width: 33%; font-weight: bold;">Остаток</td>
-                    </tr>
-                </table>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        @foreach (var contractor in @Model.Contractors)
-        {
-            <tr style="border-collapse: separate; border-spacing: 0 5px; border-bottom: 2px solid black;">
-                <td style="text-align:center;">
-                    @contractor.Name
-                </td>
-                <td style="text-align:center;">
+@if (Model.Contractors.Count() > 0)
+{
+    <div class="row">
+        <table>
+            <tr>
+                <th style="text-align:center;">Название подрядчика</th>
+                <th style="text-align:center;">Всего по договору</th>
+                <th style="text-align:center;">
+                    @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
+                    {
+                        <b>Этапы(Наличные)</b>
+                    }
+                </th>
+                <th style="text-align:center;">
+                    @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
+                    {
+                        <b>Этапы(Безналичные)</b>
+                    }
+                </th>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
                     <table style="text-align:center;">
                         <tr>
-                            <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.SummByContract</td>
-                            <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.PayedByContract</td>
-                            <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.NeedToPayByContract</td>
+                            <td style="width: 33%; font-weight: bold;">Всего по договору</td>
+                            <td style="width: 33%; font-weight: bold;">Оплачено</td>
+                            <td style="width: 33%; font-weight: bold;">Остаток</td>
                         </tr>
                     </table>
                 </td>
-                <td style="text-align:center;">
-                    @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
-                    {
-                        @Html.ActionLink("Платежи", "ContractorStages", "Stages", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })
-                    }
-                </td>
-                <td style="text-align:center;">
-                    @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
-                    {
-                        @Html.ActionLink("Платежи", "ContractorStages", "Stages", routeValues: new { @contractorId = contractor.Id, @isInCash = false }, htmlAttributes: new { @class = "btn btn-primary" })
-                    }
-                </td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
-        }
-        <tr>
-            <td style="text-align:center;"><b>Итого:</b></td>
-            <td>
-                <table style="text-align:center;">
-                    <tr>
-                        <td style="text-align: center; width: 33%;">@Model.TotalPayment.SummByContract</td>
-                        <td style="text-align: center; width: 33%;">@Model.TotalPayment.PayedByContract</td>
-                        <td style="text-align: center; width: 33%;">@Model.TotalPayment.NeedToPayByContract</td>
-                    </tr>
-                </table>
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-    </table>
-</div>
+            @foreach (var contractor in @Model.Contractors)
+            {
+                <tr style="border-collapse: separate; border-spacing: 0 5px; border-bottom: 2px solid black;">
+                    <td style="text-align:center;">
+                        @contractor.Name
+                    </td>
+                    <td style="text-align:center;">
+                        <table style="text-align:center;">
+                            <tr>
+                                <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.SummByContract</td>
+                                <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.PayedByContract</td>
+                                <td style="text-align: center; width: 33%;">@contractor.PaymentsSummary.NeedToPayByContract</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="text-align:center;">
+                        @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting"))
+                        {
+                            @Html.ActionLink("Платежи", "ContractorStages", "Stages", routeValues: new { @contractorId = contractor.Id, @isInCash = true }, htmlAttributes: new { @class = "btn btn-primary" })
+                        }
+                    </td>
+                    <td style="text-align:center;">
+                        @if (User.IsInRole("Admin") || User.IsInRole("NonCashAccounting"))
+                        {
+                            @Html.ActionLink("Платежи", "ContractorStages", "Stages", routeValues: new { @contractorId = contractor.Id, @isInCash = false }, htmlAttributes: new { @class = "btn btn-primary" })
+                        }
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:center;"><b>Итого:</b></td>
+                <td>
+                    <table style="text-align:center;">
+                        <tr>
+                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.SummByContract</td>
+                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.PayedByContract</td>
+                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.NeedToPayByContract</td>
+                        </tr>
+                    </table>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+}
+
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

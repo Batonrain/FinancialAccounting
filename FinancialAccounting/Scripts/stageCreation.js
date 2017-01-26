@@ -20,3 +20,14 @@
     $('#DateOfFinalPaymentPicker').value = '';
     $('#DateOfEndingPicker').value = '';
 });
+
+function SetDataToPicker(prepaymentDay, finalPaymentDay, dateOfEnding) {
+    $('#DateOfPrepaymentPicker').datepicker("setDate", prepaymentDay);
+    $('#DateOfFinalPaymentPicker').datepicker("setDate", finalPaymentDay);
+    $('#DateOfEndingPicker').datepicker("setDate", dateOfEnding);
+    
+    $('#DateOfPrepaymentPicker').value = prepaymentDay;
+    $('#DateOfFinalPaymentPicker').value = finalPaymentDay;
+    $('#DateOfEndingPicker').value = dateOfEnding;
+}
+

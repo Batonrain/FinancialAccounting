@@ -5,6 +5,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<script>
+    var globalVarUrl = '@Url.Action("AddPayment", "Stages")';
+</script>
+
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 @section Scripts {
@@ -12,6 +16,8 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/dialog")
 }
+
+
 
 <style>
     label, input {
@@ -113,55 +119,59 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <table>
-            <tr>
-                <th style="text-align: center; width: 30%;">Наименование работ</th>
-                <th style="text-align: center; width: 10%;">Дата выполнения работ по договору</th>
-                <th style="text-align: center;">Аванс</th>
-                <th style="text-align: center;">Дата аванса</th>
-                <th style="text-align: center;">Окончательный платеж</th>
-                <th style="text-align: center;">Дата окончательного платежа</th>
-                <th style="text-align: center;">Стоимость работ</th>
-                <th style="text-align: center; width: 10%;">Статус оплаты</th>
-                <th style="text-align: center;"></th>
-                <th style="text-align: center;"></th>
-            </tr>
-            @foreach (var stage in Model.Stages)
-            {
-                <tr style="border-bottom: 2px solid black;">
-                    <td style="text-align: center; width: 20%;">@stage.Name</td>
-                    <td style="text-align: center; width: 5%;">@stage.DateOfEnding</td>
-                    <td style="text-align: center;">@stage.Prepayment</td>
-                    <td style="text-align: center;">@stage.DateOfPrepayment</td>
-                    <td style="text-align: center;">@stage.FinalPayment</td>
-                    <td style="text-align: center;">@stage.DateOfFinalPayment</td>
-                    <td style="text-align: center;">@stage.SummOfPayment</td>
-                    @if (stage.Status == Status.Red)
-                    {
-                        <td style="text-align: center; background-color: red;">Меньше 3 дней до оплаты</td>
-                    }
-                    @if (stage.Status == Status.Yellow)
-                    {
-                        <td style="text-align: center; background-color: yellow;">Меньше 7 дней до оплаты</td>
-                    }
-                    @if (stage.Status == Status.Green)
-                    {
-                        <td style="text-align: center; background-color: green;">Меньше 10 дней до оплаты</td>
-                    }
-                    @if (stage.Status == Status.White)
-                    {
-                        <td style="text-align: center;"></td>
-                    }
-                    <td style="text-align: center;"><button name="createPayment" data-stageid="@stage.Id">Оплатить</button></td>
-                    <td style="text-align: center;"></td>
+@if (Model.Stages.Count() > 0)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <table>
+                <tr>
+                    <th style="text-align: center; width: 40%;">Наименование работ</th>
+                    <th style="text-align: center; width: 10%;">Дата выполнения работ по договору</th>
+                    <th style="text-align: center;">Аванс</th>
+                    <th style="text-align: center;">Дата аванса</th>
+                    <th style="text-align: center;">Окончательный платеж</th>
+                    <th style="text-align: center;">Дата окончательного платежа</th>
+                    <th style="text-align: center;">Стоимость работ</th>
+                    <th style="text-align: center; width: 10%;">Статус оплаты</th>
+                    <th style="text-align: center;"></th>
+                    <th style="text-align: center;"></th>
                 </tr>
-            }
-        </table>
-        <hr style="clear:both;" />
+                @foreach (var stage in Model.Stages)
+                {
+                    <tr style="border-bottom: 2px solid black;">
+                        <td style="text-align: center; width: 20%;">@stage.Name</td>
+                        <td style="text-align: center; width: 5%;">@stage.DateOfEnding</td>
+                        <td style="text-align: center;">@stage.Prepayment</td>
+                        <td style="text-align: center;">@stage.DateOfPrepayment</td>
+                        <td style="text-align: center;">@stage.FinalPayment</td>
+                        <td style="text-align: center;">@stage.DateOfFinalPayment</td>
+                        <td style="text-align: center;">@stage.SummOfPayment</td>
+                        @if (stage.Status == Status.Red)
+                        {
+                            <td style="text-align: center; background-color: red;">Меньше 3 дней до оплаты</td>
+                        }
+                        @if (stage.Status == Status.Yellow)
+                        {
+                            <td style="text-align: center; background-color: yellow;">Меньше 7 дней до оплаты</td>
+                        }
+                        @if (stage.Status == Status.Green)
+                        {
+                            <td style="text-align: center; background-color: green;">Меньше 10 дней до оплаты</td>
+                        }
+                        @if (stage.Status == Status.White)
+                        {
+                            <td style="text-align: center;"></td>
+                        }
+                        <td style="text-align: center;"><button name="createPayment" data-stageid="@stage.Id">Оплатить</button></td>
+                        <td style="text-align: center;">@Html.ActionLink("Обновить этап", "UpdateStage", "Stages", routeValues: new { @stageId = stage.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                    </tr>
+                }
+            </table>
+            <hr style="clear:both;" />
+        </div>
     </div>
-</div>
+}
+
 
 <div id="dialog-form" title="Провести платёж">
     <p class="validateTips">Все поля обязательны к заполнению.</p>

@@ -56,6 +56,31 @@ namespace FinancialAccounting.Controllers
             return View(model);
         }
 
+        public ActionResult UpdateStage(int stageId)
+        {
+            var currentStage = _stagesRepository.GetStage(stageId);
+
+            var model = StagelToCreateStageViewMode(currentStage);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateStage(CreateStageViewModel updateStageViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var stageToAdd = CreateStageViewModelToStageUpdate(updateStageViewModel);
+
+                _stagesRepository.UpdateStage(stageToAdd);
+
+                return RedirectToAction("ContractorStages", new { @contractorId = updateStageViewModel.ContractorId, @isInCash = updateStageViewModel.IsInCash });
+            }
+
+            return RedirectToAction("CreateStage", new { @contractorId = updateStageViewModel.ContractorId, @isInCash = updateStageViewModel.IsInCash });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult CreateStage(CreateStageViewModel createStageViewModel)
@@ -172,6 +197,59 @@ namespace FinancialAccounting.Controllers
                 DateOfEnding = DateTime.Parse(stageViewModel.DateOfEnding),
                 DateOfFinalPayment = DateTime.Parse(stageViewModel.DateOfFinalPayment),
                 DateOfPrepayment = DateTime.Parse(stageViewModel.DateOfPrepayment)
+            };
+        }
+
+        private Stage CreateStageViewModelToStageUpdate(CreateStageViewModel stageViewModel)
+        {
+            var currentStageData = _stagesRepository.GetStage(stageViewModel.Id);
+            var totalPayment = currentStageData.TotalPayment;
+            if (currentStageData.Prepayment > stageViewModel.Prepayment)
+            {
+                totalPayment = totalPayment - (currentStageData.Prepayment - stageViewModel.Prepayment);
+            }
+            if (currentStageData.Prepayment < stageViewModel.Prepayment)
+            {
+                totalPayment = totalPayment + (stageViewModel.Prepayment - currentStageData.Prepayment);
+            }
+
+            if (currentStageData.FinalPayment > stageViewModel.FinalPayment)
+            {
+                totalPayment = totalPayment - (currentStageData.FinalPayment - stageViewModel.FinalPayment);
+            }
+            if (currentStageData.FinalPayment < stageViewModel.FinalPayment)
+            {
+                totalPayment = totalPayment + (stageViewModel.FinalPayment - currentStageData.FinalPayment);
+            }
+
+            return new Stage
+            {
+                Id = stageViewModel.Id,
+                Name = stageViewModel.Name,
+                ContractorId = stageViewModel.ContractorId,
+                IsInCash = stageViewModel.IsInCash,
+                Prepayment = stageViewModel.Prepayment,
+                FinalPayment = stageViewModel.FinalPayment,
+                TotalPayment = totalPayment,
+                DateOfEnding = DateTime.Parse(stageViewModel.DateOfEnding),
+                DateOfFinalPayment = DateTime.Parse(stageViewModel.DateOfFinalPayment),
+                DateOfPrepayment = DateTime.Parse(stageViewModel.DateOfPrepayment)
+            };
+        }
+
+        private CreateStageViewModel StagelToCreateStageViewMode(Stage stage)
+        {
+            return new CreateStageViewModel
+            {
+                Id = stage.Id,
+                Name = stage.Name,
+                ContractorId = stage.ContractorId,
+                IsInCash = stage.IsInCash,
+                Prepayment = stage.Prepayment,
+                FinalPayment = stage.FinalPayment,
+                DateOfEnding = stage.DateOfEnding.ToShortDateString(),
+                DateOfFinalPayment = stage.DateOfFinalPayment.ToShortDateString(),
+                DateOfPrepayment = stage.DateOfPrepayment.ToShortDateString()
             };
         }
 

@@ -46,6 +46,10 @@ namespace FinancialAccounting.Controllers
                     model.ActualizationDate = model.Contractors.Max(c => c.ActualisationDate).ToString("d");
                     model.TotalPayment = GetTotalSummByContract(contractorsId);
                 }
+                else
+                {
+                    model.TotalPayment = new TotalPaymentViewModel();
+                }
 
                 return View(model);
             }
