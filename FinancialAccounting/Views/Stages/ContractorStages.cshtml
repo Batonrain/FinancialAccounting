@@ -17,8 +17,6 @@
     @Scripts.Render("~/bundles/dialog")
 }
 
-
-
 <style>
     label, input {
         display: block;
@@ -63,13 +61,13 @@
 
 <div class="row">
     <div class="col-md-12">
-        <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
+        <h2 style="text-align:left;float:left;">@Model.Name</h2>
         @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting") || User.IsInRole("NonCashAccounting"))
         {
-            <h3 style="margin-left: 5px;text-align: right; float: right;">
+            <h3 style="margin-left: 15px;text-align: right; float: left;">
                 @Html.ActionLink("Обновить подрядчика", "UpdateContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
             </h3>
-            <h3 style="margin-left: 5px;text-align: right; float: right;">
+            <h3 style="margin-left: 15px; text-align: right; float: left;">
                 @Html.ActionLink("Добавить этап", "CreateStage", "Stages", routeValues: new { @contractorId = Model.Id, isInCash = Model.IsInCahs }, htmlAttributes: new { @class = "btn btn-primary" })
             </h3>
         }
@@ -90,14 +88,28 @@
 
 <div class="row">
     <div class="col-md-12">
-        @Html.DisplayFor(m => m.TypeText)
+        <h3>@Html.DisplayFor(m => m.TypeText)</h3>
     </div>
-    <div class="col-md-12">
-        Дата актуализации: @Model.ActualisationDate.ToString("d")
+    <div style="float: left; min-height: 100px;">
+        <div style="margin-bottom: 10px;">
+            Дата актуализации: @Model.ActualisationDate.ToString("d")
+        </div>
+        <div style="margin-bottom: 10px;">
+            Актуализировано: superuser
+        </div>
     </div>
-    <div class="col-md-12">
-        Актуализировано: superuser
+    <div style="float: right; min-height: 100px;">
+        @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting") || User.IsInRole("NonCashAccounting"))
+        {
+            <div style="margin-bottom: 10px;">
+                @Html.ActionLink("Обновить подрядчика", "UpdateContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            </div>
+    <div style="margin-bottom: 10px;">
+        @Html.ActionLink("Добавить этап", "CreateStage", "Stages", routeValues: new { @contractorId = Model.Id, isInCash = Model.IsInCahs }, htmlAttributes: new { @class = "btn btn-primary" })
     </div>
+        }
+    </div>
+
     <hr style="clear:both;" />
 </div>
 
@@ -119,51 +131,55 @@
     </div>
 </div>
 
-@if (Model.Stages.Count() > 0)
+@if (Model.Stages.Any())
 {
     <div class="row">
         <div class="col-md-12">
             <table>
-                <tr>
-                    <th style="text-align: center; width: 40%;">Наименование работ</th>
-                    <th style="text-align: center; width: 10%;">Дата выполнения работ по договору</th>
-                    <th style="text-align: center;">Аванс</th>
-                    <th style="text-align: center;">Дата аванса</th>
-                    <th style="text-align: center;">Окончательный платеж</th>
-                    <th style="text-align: center;">Дата окончательного платежа</th>
-                    <th style="text-align: center;">Стоимость работ</th>
-                    <th style="text-align: center; width: 10%;">Статус оплаты</th>
-                    <th style="text-align: center;"></th>
+                <tr style="border-top: 2px solid black; border-bottom: 2px solid black; ">
+                    <th style="text-align: center; width: 40%; border-right: 2px solid black;">Наименование работ</th>
+                    <th style="text-align: center; width: 10%; border-right: 2px solid black;">Дата выполнения работ по договору</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Стоимость работ</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Аванс</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Дата аванса</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Окончательный платеж</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Дата окончательного платежа</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Оплачено</th>
+                    <th style="text-align: center; width: 10%; border-right: 2px solid black;">Статус оплаты</th>
                     <th style="text-align: center;"></th>
                 </tr>
                 @foreach (var stage in Model.Stages)
                 {
-                    <tr style="border-bottom: 2px solid black;">
-                        <td style="text-align: center; width: 20%;">@stage.Name</td>
-                        <td style="text-align: center; width: 5%;">@stage.DateOfEnding</td>
-                        <td style="text-align: center;">@stage.Prepayment</td>
-                        <td style="text-align: center;">@stage.DateOfPrepayment</td>
-                        <td style="text-align: center;">@stage.FinalPayment</td>
-                        <td style="text-align: center;">@stage.DateOfFinalPayment</td>
-                        <td style="text-align: center;">@stage.SummOfPayment</td>
+                    <tr style="border-bottom: 2px solid black; padding-bottom: 5px;">
+                        <td style="text-align: center; width: 20%; border-right: 2px solid black;">@stage.Name</td>
+                        <td style="text-align: center; width: 5%; border-right: 2px solid black;">@stage.DateOfEnding</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.SummOfPayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.Prepayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.DateOfPrepayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.FinalPayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.DateOfFinalPayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.TotalPayed</td>
                         @if (stage.Status == Status.Red)
                         {
-                            <td style="text-align: center; background-color: red;">Меньше 3 дней до оплаты</td>
+                            <td style="text-align: center; background-color: red; border-right: 2px solid black;">< 3</td>
                         }
                         @if (stage.Status == Status.Yellow)
                         {
-                            <td style="text-align: center; background-color: yellow;">Меньше 7 дней до оплаты</td>
+                            <td style="text-align: center; background-color: yellow; border-right: 2px solid black;">< 7</td>
                         }
                         @if (stage.Status == Status.Green)
                         {
-                            <td style="text-align: center; background-color: green;">Меньше 10 дней до оплаты</td>
+                            <td style="text-align: center; background-color: green; border-right: 2px solid black;">> 10</td>
                         }
                         @if (stage.Status == Status.White)
                         {
-                            <td style="text-align: center;"></td>
+                            <td style="text-align: center; border-right: 2px solid black;"></td>
                         }
-                        <td style="text-align: center;"><button name="createPayment" data-stageid="@stage.Id">Оплатить</button></td>
-                        <td style="text-align: center;">@Html.ActionLink("Обновить этап", "UpdateStage", "Stages", routeValues: new { @stageId = stage.Id }, htmlAttributes: new { @class = "btn btn-primary" })</td>
+                        <td style="text-align: center;">
+                            <button name="createPayment" data-stageid="@stage.Id">Оплатить</button>
+                            <br />
+                            @Html.ActionLink("Изменить", "UpdateStage", "Stages", routeValues: new { @stageId = stage.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                        </td>
                     </tr>
                 }
             </table>

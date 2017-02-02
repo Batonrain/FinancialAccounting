@@ -25,7 +25,9 @@ namespace FinancialAccounting.Controllers
         public ActionResult ContractorStages(int contractorId, bool isInCash)
         {
             var contractorInfo = _buildingObjectRepository.GetContractorById(contractorId);
-            var stages = _stagesRepository.GetStages(contractorId, isInCash).ToList();
+
+            var stages = _stagesRepository.GetStages(contractorId, isInCash);
+
             var viewModel = new ContractorViewModel
             {
                 BuildingObjectId = contractorInfo.BuildingObjectId,
@@ -34,7 +36,7 @@ namespace FinancialAccounting.Controllers
                 Name = contractorInfo.Name,
                 IsInCahs = isInCash,
                 TypeText = isInCash ? "Наличная оплата" : "Безналичная оплата",
-                Stages = stages.Select(StagesToStageViewModel).ToList(),
+                Stages = stages.Select(StagesToStageViewModel).OrderBy(s=> s.Name).ToList(),
                 PaymentsSummary = GetSummaryPayments(stages)
             };
 
@@ -48,11 +50,24 @@ namespace FinancialAccounting.Controllers
 
         public ActionResult CreateStage(int contractorId, bool isInCash)
         {
+            var types = new List<KeyValuePair<bool, string>>
+            {
+                new KeyValuePair<bool, string>(false, "Безналичная оплата"),
+                new KeyValuePair<bool, string>(true, "Наличная оплата")
+            };
+
+            var contractors = _buildingObjectRepository.GetContractors();
+
+            var contractorsSelect = contractors.Select(contractor => new KeyValuePair<int, string>(contractor.Id, contractor.Name)).ToList();
+
             var model = new CreateStageViewModel
             {
                 ContractorId = contractorId,
-                IsInCash = isInCash
+                IsInCash = isInCash,
+                Types = types,
+                ContractorsSelect = contractorsSelect
             };
+
             return View(model);
         }
 
@@ -61,6 +76,14 @@ namespace FinancialAccounting.Controllers
             var currentStage = _stagesRepository.GetStage(stageId);
 
             var model = StagelToCreateStageViewMode(currentStage);
+
+            var types = new List<KeyValuePair<bool, string>>
+            {
+                new KeyValuePair<bool, string>(false, "Безналичная оплата"),
+                new KeyValuePair<bool, string>(true, "Наличная оплата")
+            };
+
+            model.Types = types;
 
             return View(model);
         }
@@ -78,7 +101,7 @@ namespace FinancialAccounting.Controllers
                 return RedirectToAction("ContractorStages", new { @contractorId = updateStageViewModel.ContractorId, @isInCash = updateStageViewModel.IsInCash });
             }
 
-            return RedirectToAction("CreateStage", new { @contractorId = updateStageViewModel.ContractorId, @isInCash = updateStageViewModel.IsInCash });
+            return RedirectToAction("UpdateStage", new { stageId = updateStageViewModel.Id });
         }
 
         [HttpPost]
@@ -106,14 +129,14 @@ namespace FinancialAccounting.Controllers
 
                 if (model.PaymentType == 1)
                 {
-                    currentStage.FinalPayment = currentStage.FinalPayment - Convert.ToDecimal(model.PaymentSum);
-                    _stagesRepository.UpdateStagePayment(currentStage);
+                    currentStage.FinalPaymentPayed = currentStage.FinalPaymentPayed + Convert.ToDecimal(model.PaymentSum);
                 }
                 if (model.PaymentType == 2)
                 {
-                    currentStage.Prepayment = currentStage.Prepayment - Convert.ToDecimal(model.PaymentSum);
-                    _stagesRepository.UpdateStagePayment(currentStage);
+                    currentStage.PrepaymentPayed = currentStage.PrepaymentPayed + Convert.ToDecimal(model.PaymentSum);
                 }
+
+                _stagesRepository.UpdateStagePayment(currentStage);
 
                 return Json("Success");
             }
@@ -121,11 +144,19 @@ namespace FinancialAccounting.Controllers
             return Json("An Error Has occoured");
         }
 
+        public ActionResult RemoveStage(int stageId)
+        {
+            var currentStage = _stagesRepository.GetStage(stageId);
+            _stagesRepository.RemoveStage(currentStage);
+
+            return RedirectToAction("ContractorStages", new { @contractorId = currentStage.ContractorId, @isInCash = currentStage.IsInCash });
+        }
+
         private Status GetCurrentStatus(Stage stage)
         {
-            var prepaymentTotalDaysGreen = (stage.DateOfPrepayment - DateTime.Now).TotalDays > 10 && stage.Prepayment > 0;
-            var prepaymentTotalDaysYellow = (stage.DateOfPrepayment - DateTime.Now).TotalDays < 10 && (stage.DateOfPrepayment - DateTime.Now).TotalDays >= 4 && stage.Prepayment > 0;
-            var prepaymentTotalDaysRed = (stage.DateOfPrepayment - DateTime.Now).TotalDays < 3 && stage.Prepayment > 0;
+            var prepaymentTotalDaysGreen = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays > 10 && stage.Prepayment > 0);
+            var prepaymentTotalDaysYellow = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays < 10 && (stage.DateOfPrepayment.Value - DateTime.Now).TotalDays >= 4 && stage.Prepayment > 0);
+            var prepaymentTotalDaysRed = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays < 3 && stage.Prepayment > 0);
 
             if (prepaymentTotalDaysGreen)
             {
@@ -142,9 +173,9 @@ namespace FinancialAccounting.Controllers
                 return Status.Red;
             }
 
-            var finalPaymentTotalDaysGreen = (stage.DateOfFinalPayment - DateTime.Now).TotalDays > 10 && stage.FinalPayment > 0;
-            var finalPaymentTotalDaysYellow = (stage.DateOfFinalPayment - DateTime.Now).TotalDays < 10 && (stage.DateOfFinalPayment - DateTime.Now).TotalDays >= 4 && stage.FinalPayment > 0;
-            var finalPaymentTotalDaysRed = (stage.DateOfFinalPayment - DateTime.Now).TotalDays < 3 && stage.FinalPayment > 0;
+            var finalPaymentTotalDaysGreen = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays > 10 && stage.FinalPayment > 0);
+            var finalPaymentTotalDaysYellow = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays < 10 && (stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays >= 4 && stage.FinalPayment > 0);
+            var finalPaymentTotalDaysRed = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays < 3 && stage.FinalPayment > 0);
 
             if (finalPaymentTotalDaysGreen)
             {
@@ -172,13 +203,24 @@ namespace FinancialAccounting.Controllers
                 ContractorId = stage.ContractorId,
                 Name = stage.Name,
                 IsInCash = stage.IsInCash,
-                Prepayment = stage.Prepayment.ToString("C0"),
-                FinalPayment = stage.FinalPayment.ToString("C0"),
-                TotalPayment = stage.TotalPayment.ToString("C0"),
-                SummOfPayment = (stage.Prepayment + stage.FinalPayment).ToString("C0"),
-                DateOfEnding = stage.DateOfEnding.ToString("d"),
-                DateOfFinalPayment = stage.DateOfFinalPayment.ToString("d"),
-                DateOfPrepayment = stage.DateOfPrepayment.ToString("d"),
+
+                Prepayment = stage.Prepayment.ToString("C2"),
+                FinalPayment = stage.FinalPayment.ToString("C2"),
+                TotalPayment = stage.TotalPayment.ToString("C2"),
+
+                PrepaymentPayed = stage.PrepaymentPayed.ToString("C2"),
+                FinalPaymentPayed = stage.FinalPaymentPayed.ToString("C2"),
+                TotalPayed = (stage.PrepaymentPayed + stage.FinalPaymentPayed).ToString("C2"),
+
+                IsPrepaymentFullyPayed = stage.PrepaymentPayed >= stage.Prepayment,
+                IsFinalPaymentFullyPayed = stage.FinalPaymentPayed >= stage.FinalPayment,
+
+                SummOfPayment = (stage.Prepayment + stage.FinalPayment).ToString("C2"),
+
+                DateOfEnding = stage.DateOfEnding.HasValue ? stage.DateOfEnding.Value.ToString("d") : string.Empty,
+                DateOfFinalPayment = stage.DateOfFinalPayment.HasValue ? stage.DateOfFinalPayment.Value.ToString("d") : string.Empty,
+                DateOfPrepayment = stage.DateOfPrepayment.HasValue ? stage.DateOfPrepayment.Value.ToString("d") : string.Empty,
+
                 Status = GetCurrentStatus(stage)
             };
         }
@@ -194,9 +236,10 @@ namespace FinancialAccounting.Controllers
                 Prepayment = stageViewModel.Prepayment,
                 FinalPayment = stageViewModel.FinalPayment,
                 TotalPayment = stageViewModel.Prepayment + stageViewModel.FinalPayment,
-                DateOfEnding = DateTime.Parse(stageViewModel.DateOfEnding),
-                DateOfFinalPayment = DateTime.Parse(stageViewModel.DateOfFinalPayment),
-                DateOfPrepayment = DateTime.Parse(stageViewModel.DateOfPrepayment)
+                TotalPayed = 0,
+                DateOfEnding = stageViewModel.DateOfEnding == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfEnding),
+                DateOfFinalPayment = stageViewModel.DateOfFinalPayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfFinalPayment),
+                DateOfPrepayment = stageViewModel.DateOfPrepayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfPrepayment)
             };
         }
 
@@ -231,9 +274,9 @@ namespace FinancialAccounting.Controllers
                 Prepayment = stageViewModel.Prepayment,
                 FinalPayment = stageViewModel.FinalPayment,
                 TotalPayment = totalPayment,
-                DateOfEnding = DateTime.Parse(stageViewModel.DateOfEnding),
-                DateOfFinalPayment = DateTime.Parse(stageViewModel.DateOfFinalPayment),
-                DateOfPrepayment = DateTime.Parse(stageViewModel.DateOfPrepayment)
+                DateOfEnding = stageViewModel.DateOfEnding == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfEnding),
+                DateOfFinalPayment = stageViewModel.DateOfFinalPayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfFinalPayment),
+                DateOfPrepayment = stageViewModel.DateOfPrepayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfPrepayment)
             };
         }
 
@@ -247,43 +290,23 @@ namespace FinancialAccounting.Controllers
                 IsInCash = stage.IsInCash,
                 Prepayment = stage.Prepayment,
                 FinalPayment = stage.FinalPayment,
-                DateOfEnding = stage.DateOfEnding.ToShortDateString(),
-                DateOfFinalPayment = stage.DateOfFinalPayment.ToShortDateString(),
-                DateOfPrepayment = stage.DateOfPrepayment.ToShortDateString()
+                DateOfEnding = stage.DateOfEnding.HasValue ? stage.DateOfEnding.Value.ToShortDateString() : string.Empty,
+                DateOfFinalPayment = stage.DateOfFinalPayment.HasValue ? stage.DateOfFinalPayment.Value.ToShortDateString() : string.Empty,
+                DateOfPrepayment = stage.DateOfPrepayment.HasValue ? stage.DateOfPrepayment.Value.ToShortDateString() : string.Empty
             };
         }
 
-        private PaymentSummaryViewModel GetSummaryPayments(IEnumerable<Stage> stages)
+        private PaymentSummaryViewModel GetSummaryPayments(IList<Stage> stages)
         {
+            var summByContract = stages.Sum(s => s.TotalPayment);
+            var payedByContract = stages.Sum(s => s.PrepaymentPayed + s.FinalPaymentPayed);
+
             return new PaymentSummaryViewModel
             {
-                SummByContract = stages.Sum(s => s.TotalPayment).ToString("C0"),
-                PayedByContract = (stages.Sum(s => s.TotalPayment) - stages.Sum(s => s.Prepayment + s.FinalPayment)).ToString("C0"),
-                NeedToPayByContract = stages.Sum(s => s.Prepayment + s.FinalPayment).ToString("C0")
+                SummByContract = summByContract.ToString("C2"),
+                PayedByContract = payedByContract.ToString("C2"),
+                NeedToPayByContract = (summByContract - payedByContract).ToString("C2")
             };
         }
-
-        //private Dictionary<string, bool> CreatePaymentDictionary()
-        //{
-        //    var result = new Dictionary<string, bool>();
-
-        //    if (User.IsInRole("Admin"))
-        //    {
-        //        result.Add("Наличные", true);
-        //        result.Add("Безнал", false);
-        //    }
-
-        //    if (User.IsInRole("CashAccounting"))
-        //    {
-        //        result.Add("Наличные", true);
-        //    }
-
-        //    if (User.IsInRole("NonCashAccounting"))
-        //    {
-        //        result.Add("Безнал", true);
-        //    }
-
-        //    return result;
-        //}
     }
 }

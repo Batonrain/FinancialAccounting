@@ -20,9 +20,9 @@ namespace FinancialAccountingConstruction.DAL.Repository
             return _context.Stages.Where(c => c.ContractorId == contractorId);
         }
 
-        public IEnumerable<Stage> GetStages(int contractorId, bool isInCash)
+        public IList<Stage> GetStages(int contractorId, bool isInCash)
         {
-            return _context.Stages.Where(c => c.ContractorId == contractorId && c.IsInCash == isInCash);
+            return _context.Stages.Where(c => c.ContractorId == contractorId && c.IsInCash == isInCash).ToList();
         }
 
         public Stage GetStage(int stageId)
@@ -35,9 +35,12 @@ namespace FinancialAccountingConstruction.DAL.Repository
             stage.DateOfActualisation = DateTime.Now;
             _context.Stages.Attach(stage);
             var entry = _context.Entry(stage);
-            entry.Property(e => e.FinalPayment).IsModified = true;
-            entry.Property(e => e.Prepayment).IsModified = true;
+
+            entry.Property(e => e.PrepaymentPayed).IsModified = true;
+            entry.Property(e => e.FinalPaymentPayed).IsModified = true;
+            entry.Property(e => e.TotalPayed).IsModified = true;
             entry.Property(e => e.DateOfActualisation).IsModified = true;
+
             _context.SaveChanges();
         }
 
@@ -70,17 +73,12 @@ namespace FinancialAccountingConstruction.DAL.Repository
                 }
             }
 
-            //entry.State = EntityState.Modified;
+            _context.SaveChanges();
+        }
 
-            //entry.Property(e => e.FinalPayment).IsModified = true;
-            //entry.Property(e => e.Prepayment).IsModified = true;
-            //entry.Property(e => e.TotalPayment).IsModified = true;
-            //entry.Property(e => e.DateOfActualisation).IsModified = true;
-            //entry.Property(e => e.DateOfEnding).IsModified = true;
-            //entry.Property(e => e.DateOfFinalPayment).IsModified = true;
-            //entry.Property(e => e.DateOfPrepayment).IsModified = true;
-            //entry.Property(e => e.Name).IsModified = true;
-
+        public void RemoveStage(Stage stage)
+        {
+            _context.Stages.Remove(stage);
             _context.SaveChanges();
         }
     }

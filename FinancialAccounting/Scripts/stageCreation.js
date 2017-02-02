@@ -4,8 +4,7 @@
         changeMonth: true,
         changeYear: true,
         yearRange: '1900:2100',
-        defaultDate: '',
-        minDate: 0,
+        defaultDate: ''
     });
 
     $('#DateOfPrepaymentPicker').datepicker();

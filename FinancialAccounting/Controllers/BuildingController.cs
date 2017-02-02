@@ -104,6 +104,13 @@ namespace FinancialAccounting.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        public ActionResult RemoveContractor(int contractorId)
+        {
+            _buildingObjectRepository.RemoveContractorById(contractorId);
+
+            return RedirectToAction("Index", "Home");
+        }
+
         public ActionResult CreateContractorForObject(int buildingId)
         {
             var viewModel = new CreateContractorViewModel()
@@ -133,7 +140,7 @@ namespace FinancialAccounting.Controllers
         public ActionResult UpdateContractor(int contractorId)
         {
             var contractorObject = _buildingObjectRepository.GetContractorById(contractorId);
-            
+
             var contractorViewModel = ToUpdateContractorViewModel(contractorObject);
 
             return View(contractorViewModel);
@@ -146,7 +153,7 @@ namespace FinancialAccounting.Controllers
             var obj = ToUpdateContractorObj(contractor);
             _contractorsRepository.UpdateContractor(obj);
 
-            return RedirectToAction("ContractorStages", "Stages", new { @contractorId = contractor.Id });
+            return RedirectToAction("Index", "Building", new { id = contractor.BuildingObjectId });
         }
 
         public ContractorViewModel GetContractorData(int contractorId)
@@ -156,11 +163,14 @@ namespace FinancialAccounting.Controllers
             var contractorViewModel = ToContractorPaymentsViewModel(contractorObject);
             var allStages = _stagesRepository.GetAllStages(contractorId).ToList();
 
+            var summByContract = allStages.Sum(s => s.TotalPayment);
+            var payedByContract = allStages.Sum(s => s.PrepaymentPayed + s.FinalPaymentPayed);
+
             contractorViewModel.PaymentsSummary = new PaymentSummaryViewModel
             {
-                SummByContract = allStages.Sum(s => s.TotalPayment).ToString("C0"),
-                PayedByContract = (allStages.Sum(s => s.TotalPayment) - allStages.Sum(s => s.Prepayment + s.FinalPayment)).ToString("C0"),
-                NeedToPayByContract = allStages.Sum(s => s.Prepayment + s.FinalPayment).ToString("C0")
+                SummByContract = summByContract.ToString("C2"),
+                PayedByContract = payedByContract.ToString("C2"),
+                NeedToPayByContract = (summByContract - payedByContract).ToString("C2")
             };
 
             if (allStages.Count == 0)
@@ -181,17 +191,16 @@ namespace FinancialAccounting.Controllers
             {
                 summByContract = summByContract + allStages.Sum(s => s.TotalPayment);
 
-                payedByContract = payedByContract + (allStages.Sum(s => s.TotalPayment) -
-                                                     allStages.Sum(s => s.Prepayment + s.FinalPayment));
-
-                needToPayByContract = needToPayByContract + allStages.Sum(s => s.Prepayment + s.FinalPayment);
+                payedByContract = payedByContract + allStages.Sum(s => s.PrepaymentPayed + s.FinalPaymentPayed);
             }
+
+            needToPayByContract = needToPayByContract + (summByContract - payedByContract);
 
             return new TotalPaymentViewModel
             {
-                SummByContract = summByContract.ToString("C0"),
-                PayedByContract = payedByContract.ToString("C0"),
-                NeedToPayByContract = needToPayByContract.ToString("C0")
+                SummByContract = summByContract.ToString("C2"),
+                PayedByContract = payedByContract.ToString("C2"),
+                NeedToPayByContract = needToPayByContract.ToString("C2")
             };
         }
 

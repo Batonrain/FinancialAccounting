@@ -5,7 +5,7 @@ using FinancialAccountingConstruction.DAL.Models.Contractors;
 
 namespace FinancialAccountingConstruction.DAL.Repository
 {
-    public class BuildingObjectRepository 
+    public class BuildingObjectRepository
     {
         private readonly FinancialAccountingDbContext _context;
 
@@ -42,13 +42,32 @@ namespace FinancialAccountingConstruction.DAL.Repository
         public void RemoveBuildingObjectById(int id)
         {
             var toDelete = _context.BuildingObjects.Single(obj => obj.Id == id);
+            var contractorsToDelete = _context.Contractors.Where(c => c.BuildingObjectId == id);
+            var stagesToDelete = _context.Stages.Where(s => contractorsToDelete.Any(c => s.ContractorId == c.Id));
+
             _context.BuildingObjects.Remove(toDelete);
+            _context.Contractors.RemoveRange(contractorsToDelete);
+            _context.Stages.RemoveRange(stagesToDelete);
+            _context.SaveChanges();
+        }
+
+        public void RemoveContractorById(int id)
+        {
+            var toDelete = _context.Contractors.Single(obj => obj.Id == id);
+            var stagesToDelete = _context.Stages.Where(s => s.ContractorId == toDelete.Id);
+            _context.Contractors.Remove(toDelete);
+            _context.Stages.RemoveRange(stagesToDelete);
             _context.SaveChanges();
         }
 
         public Contractor GetContractorById(int id)
         {
             return _context.Contractors.Single(obj => obj.Id == id);
+        }
+
+        public IEnumerable<Contractor> GetContractors()
+        {
+            return _context.Contractors.ToList();
         }
     }
 }

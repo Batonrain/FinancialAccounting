@@ -9,7 +9,7 @@
     <div class="col-md-12">
         <h2 style="text-align:left;float:left;">@ViewBag.Title</h2>
         <h3 style="margin-left: 5px;text-align: right; float: right;">
-            @Html.ActionLink("Удалить объект", "RemoveObject", "Building", routeValues: new { @buildingId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+            @Html.ActionLink("Удалить подрядчика", "RemoveContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
     </div>
 </div>

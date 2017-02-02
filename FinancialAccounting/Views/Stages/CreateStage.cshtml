@@ -24,12 +24,33 @@
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary()
-            @Html.HiddenFor(m => m.ContractorId)
             @Html.HiddenFor(m => m.IsInCash)
+            <div class="form-group">
+                @Html.LabelFor(m => m.ContractorId, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(m => m.ContractorId, Model.ContractorsSelect.Select(ms => new SelectListItem
+                    {
+                        Text = ms.Value,
+                        Value = ms.Key.ToString(),
+                        Selected = ms.Key == Model.ContractorId
+                    }))
+                </div>
+            </div>
             <div class="form-group">
                 @Html.LabelFor(m => m.Name, new { @class = "col-md-2 control-label" })
                 <div class="col-md-10">
-                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    @Html.TextAreaFor(m => m.Name, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.IsInCash, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(m => m.IsInCash, Model.Types.Select(ms => new SelectListItem
+                    {
+                        Text = ms.Value,
+                        Value = ms.Key.ToString(),
+                        Selected = Model.IsInCash
+                    }))
                 </div>
             </div>
             <div class="form-group">
