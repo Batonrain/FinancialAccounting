@@ -72,6 +72,15 @@ namespace FinancialAccounting.Controllers
             return View(model);
         }
 
+        public ActionResult DuplicateStage(int stageId)
+        {
+            var stage = _stagesRepository.GetStage(stageId);
+
+            _stagesRepository.AddStage(stage);
+
+            return RedirectToAction("UpdateStage", new { stageId = stage.Id });
+        }
+
         public ActionResult UpdateStage(int stageId)
         {
             var currentStage = _stagesRepository.GetStage(stageId);

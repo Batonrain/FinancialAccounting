@@ -24,6 +24,9 @@
         <h3 style="margin-left: 5px;text-align: right; float: right;">
             @Html.ActionLink("Удалить этап", "RemoveStage", "Stages", routeValues: new { @stageId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
         </h3>
+        <h3 style="margin-left: 5px;text-align: right; float: right;">
+            @Html.ActionLink("Дублировать этап", "DuplicateStage", "Stages", routeValues: new { @stageId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+        </h3>
         <hr style="clear:both;" />
     </div>
 </div>
