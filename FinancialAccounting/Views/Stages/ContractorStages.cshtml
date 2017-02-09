@@ -62,15 +62,6 @@
 <div class="row">
     <div class="col-md-12">
         <h2 style="text-align:left;float:left;">@Model.Name</h2>
-        @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting") || User.IsInRole("NonCashAccounting"))
-        {
-            <h3 style="margin-left: 15px;text-align: right; float: left;">
-                @Html.ActionLink("Обновить подрядчика", "UpdateContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
-            </h3>
-            <h3 style="margin-left: 15px; text-align: right; float: left;">
-                @Html.ActionLink("Добавить этап", "CreateStage", "Stages", routeValues: new { @contractorId = Model.Id, isInCash = Model.IsInCahs }, htmlAttributes: new { @class = "btn btn-primary" })
-            </h3>
-        }
         <hr style="clear:both;" />
     </div>
 </div>
@@ -95,7 +86,7 @@
             Дата актуализации: @Model.ActualisationDate.ToString("d")
         </div>
         <div style="margin-bottom: 10px;">
-            Актуализировано: superuser
+            Актуализировано: @Model.ActualisationPerson
         </div>
     </div>
     <div style="float: right; min-height: 100px;">

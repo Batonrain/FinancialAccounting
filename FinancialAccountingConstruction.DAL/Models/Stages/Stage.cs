@@ -37,5 +37,6 @@ namespace FinancialAccountingConstruction.DAL.Models.Stages
 
 
         public bool IsInCash { get; set; }
+        public string ActualizedBy { get; set; }
     }
 }

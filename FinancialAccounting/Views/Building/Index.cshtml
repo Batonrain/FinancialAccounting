@@ -32,7 +32,7 @@
         Дата актуализации: @Model.ActualizationDate
     </div>
     <div class="col-md-12">
-        Актуализировал: superuser
+        Актуализировал: @Model.ActualizationPerson
     </div>
     <hr style="clear:both;" />
 </div>
@@ -72,6 +72,20 @@
                 <td></td>
                 <td></td>
             </tr>
+            <tr style="border-bottom: 1px solid black;">
+                <td style="text-align:center;"><b>Итого:</b></td>
+                <td>
+                    <table style="text-align:center;">
+                        <tr>
+                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.SummByContract</td>
+                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.PayedByContract</td>
+                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.NeedToPayByContract</td>
+                        </tr>
+                    </table>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
             @foreach (var contractor in @Model.Contractors)
             {
                 <tr style="border-collapse: separate; border-spacing: 0 5px; border-bottom: 2px solid black;">
@@ -101,20 +115,6 @@
                     </td>
                 </tr>
             }
-            <tr>
-                <td style="text-align:center;"><b>Итого:</b></td>
-                <td>
-                    <table style="text-align:center;">
-                        <tr>
-                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.SummByContract</td>
-                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.PayedByContract</td>
-                            <td style="text-align: center; width: 33%;">@Model.TotalPayment.NeedToPayByContract</td>
-                        </tr>
-                    </table>
-                </td>
-                <td></td>
-                <td></td>
-            </tr>
         </table>
     </div>
 }

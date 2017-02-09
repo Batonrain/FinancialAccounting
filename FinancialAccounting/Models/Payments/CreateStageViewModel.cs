@@ -44,6 +44,7 @@ namespace FinancialAccounting.Models.Payments
         public decimal TotalPayed { get; set; }
         public decimal PrepaymentPayed { get; set; }
         public decimal FinalPaymentPayed { get; set; }
+        public string ActualizedBy { get; set; }
 
         public List<KeyValuePair<bool, string>> Types { get; set; }
         public List<KeyValuePair<int, string>> ContractorsSelect { get; set; }

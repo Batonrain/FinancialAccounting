@@ -37,12 +37,13 @@ namespace FinancialAccounting.Controllers
                 IsInCahs = isInCash,
                 TypeText = isInCash ? "Наличная оплата" : "Безналичная оплата",
                 Stages = stages.Select(StagesToStageViewModel).OrderBy(s=> s.Name).ToList(),
-                PaymentsSummary = GetSummaryPayments(stages)
+                PaymentsSummary = GetSummaryPayments(stages)  
             };
 
             if (stages.Count != 0)
             {
                 viewModel.ActualisationDate = stages.Max(s => s.DateOfActualisation);
+                viewModel.ActualisationPerson = stages.OrderByDescending(s => s.DateOfActualisation).FirstOrDefault().ActualizedBy;
             }
 
             return View(viewModel);
@@ -154,9 +155,12 @@ namespace FinancialAccounting.Controllers
 
         private Status GetCurrentStatus(Stage stage)
         {
-            var prepaymentTotalDaysGreen = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays > 10 && stage.Prepayment > 0);
-            var prepaymentTotalDaysYellow = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays < 10 && (stage.DateOfPrepayment.Value - DateTime.Now).TotalDays >= 4 && stage.Prepayment > 0);
-            var prepaymentTotalDaysRed = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays < 3 && stage.Prepayment > 0);
+            var isPrepaymentPayed = (stage.Prepayment - stage.PrepaymentPayed) <= 0;
+            var isFinalPaymentPayedPayed = (stage.FinalPayment - stage.FinalPaymentPayed) <= 0;
+
+            var prepaymentTotalDaysGreen = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays > 10 && stage.Prepayment > 0) && !isPrepaymentPayed;
+            var prepaymentTotalDaysYellow = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays < 10 && (stage.DateOfPrepayment.Value - DateTime.Now).TotalDays >= 4 && stage.Prepayment > 0) && !isPrepaymentPayed;
+            var prepaymentTotalDaysRed = stage.DateOfPrepayment != null && ((stage.DateOfPrepayment.Value - DateTime.Now).TotalDays < 3 && stage.Prepayment > 0) && !isPrepaymentPayed;
 
             if (prepaymentTotalDaysGreen)
             {
@@ -173,9 +177,9 @@ namespace FinancialAccounting.Controllers
                 return Status.Red;
             }
 
-            var finalPaymentTotalDaysGreen = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays > 10 && stage.FinalPayment > 0);
-            var finalPaymentTotalDaysYellow = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays < 10 && (stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays >= 4 && stage.FinalPayment > 0);
-            var finalPaymentTotalDaysRed = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays < 3 && stage.FinalPayment > 0);
+            var finalPaymentTotalDaysGreen = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays > 10 && stage.FinalPayment > 0) && !isFinalPaymentPayedPayed;
+            var finalPaymentTotalDaysYellow = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays < 10 && (stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays >= 4 && stage.FinalPayment > 0) && !isFinalPaymentPayedPayed;
+            var finalPaymentTotalDaysRed = stage.DateOfFinalPayment != null && ((stage.DateOfFinalPayment.Value - DateTime.Now).TotalDays < 3 && stage.FinalPayment > 0) && !isFinalPaymentPayedPayed;
 
             if (finalPaymentTotalDaysGreen)
             {
@@ -221,7 +225,9 @@ namespace FinancialAccounting.Controllers
                 DateOfFinalPayment = stage.DateOfFinalPayment.HasValue ? stage.DateOfFinalPayment.Value.ToString("d") : string.Empty,
                 DateOfPrepayment = stage.DateOfPrepayment.HasValue ? stage.DateOfPrepayment.Value.ToString("d") : string.Empty,
 
-                Status = GetCurrentStatus(stage)
+                Status = GetCurrentStatus(stage),
+
+                ActualizedBy = string.IsNullOrEmpty(stage.ActualizedBy) ? "Superuser" : stage.ActualizedBy
             };
         }
 
@@ -239,7 +245,8 @@ namespace FinancialAccounting.Controllers
                 TotalPayed = 0,
                 DateOfEnding = stageViewModel.DateOfEnding == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfEnding),
                 DateOfFinalPayment = stageViewModel.DateOfFinalPayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfFinalPayment),
-                DateOfPrepayment = stageViewModel.DateOfPrepayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfPrepayment)
+                DateOfPrepayment = stageViewModel.DateOfPrepayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfPrepayment),
+                ActualizedBy = User.Identity.Name
             };
         }
 
@@ -272,7 +279,9 @@ namespace FinancialAccounting.Controllers
                 ContractorId = stageViewModel.ContractorId,
                 IsInCash = stageViewModel.IsInCash,
                 Prepayment = stageViewModel.Prepayment,
+                PrepaymentPayed = stageViewModel.PrepaymentPayed,
                 FinalPayment = stageViewModel.FinalPayment,
+                FinalPaymentPayed = stageViewModel.FinalPaymentPayed,
                 TotalPayment = totalPayment,
                 DateOfEnding = stageViewModel.DateOfEnding == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfEnding),
                 DateOfFinalPayment = stageViewModel.DateOfFinalPayment == null ? (DateTime?)null : DateTime.Parse(stageViewModel.DateOfFinalPayment),
@@ -289,7 +298,9 @@ namespace FinancialAccounting.Controllers
                 ContractorId = stage.ContractorId,
                 IsInCash = stage.IsInCash,
                 Prepayment = stage.Prepayment,
+                PrepaymentPayed = stage.PrepaymentPayed,
                 FinalPayment = stage.FinalPayment,
+                FinalPaymentPayed = stage.FinalPaymentPayed,
                 DateOfEnding = stage.DateOfEnding.HasValue ? stage.DateOfEnding.Value.ToShortDateString() : string.Empty,
                 DateOfFinalPayment = stage.DateOfFinalPayment.HasValue ? stage.DateOfFinalPayment.Value.ToShortDateString() : string.Empty,
                 DateOfPrepayment = stage.DateOfPrepayment.HasValue ? stage.DateOfPrepayment.Value.ToShortDateString() : string.Empty

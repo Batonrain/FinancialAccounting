@@ -36,6 +36,8 @@ namespace FinancialAccounting.Models.Payments
         public bool IsFinalPaymentFullyPayed { get; set; }
         public bool IsInCash { get; set; }
 
+        public string ActualizedBy { get; set; }
+
         public Status Status { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace FinancialAccounting.Models.Buildings
         public List<ContractorViewModel> Contractors { get; set; }
 
         public string ActualizationDate { get; set; }
+        public string ActualizationPerson { get; set; }
 
         public TotalPaymentViewModel TotalPayment { get; set; }
     }

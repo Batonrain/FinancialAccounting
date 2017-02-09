@@ -44,6 +44,8 @@ namespace FinancialAccounting.Controllers
                 if (model.Contractors.Count != 0)
                 {
                     model.ActualizationDate = model.Contractors.Max(c => c.ActualisationDate).ToString("d");
+                    model.ActualizationPerson =
+                        model.Contractors.OrderByDescending(c => c.ActualisationDate).FirstOrDefault().ActualisationPerson;
                     model.TotalPayment = GetTotalSummByContract(contractorsId);
                 }
                 else
@@ -177,6 +179,8 @@ namespace FinancialAccounting.Controllers
                 return contractorViewModel;
 
             contractorViewModel.ActualisationDate = allStages.Max(s => s.DateOfActualisation);
+            contractorViewModel.ActualisationPerson =
+                allStages.OrderByDescending(s => s.DateOfActualisation).FirstOrDefault().ActualizedBy;
 
             return contractorViewModel;
         }
@@ -223,7 +227,7 @@ namespace FinancialAccounting.Controllers
                 Id = contractor.Id,
                 BuildingObjectId = contractor.BuildingObjectId,
                 Name = contractor.Name,
-                Description = contractor.Description,
+                Description = contractor.Description
             };
         }
 
