@@ -66,7 +66,9 @@ namespace FinancialAccounting.Controllers
                 ContractorId = contractorId,
                 IsInCash = isInCash,
                 Types = types,
-                ContractorsSelect = contractorsSelect
+                ContractorsSelect = contractorsSelect,
+                FinalPayment = 00.00M,
+                Prepayment = 00.00M
             };
 
             return View(model);
