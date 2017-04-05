@@ -280,6 +280,7 @@
     <Content Include="Views\Building\UpdateContractor.cshtml" />
     <Content Include="Views\Stages\CreateStage.cshtml" />
     <Content Include="Views\Stages\UpdateStage.cshtml" />
+    <Content Include="Views\Stages\PrintPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

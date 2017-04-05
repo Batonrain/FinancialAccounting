@@ -98,9 +98,12 @@
             <div style="margin-bottom: 10px;">
                 @Html.ActionLink("Обновить подрядчика", "UpdateContractor", "Building", routeValues: new { @contractorId = Model.Id }, htmlAttributes: new { @class = "btn btn-primary" })
             </div>
-    <div style="margin-bottom: 10px;">
-        @Html.ActionLink("Добавить этап", "CreateStage", "Stages", routeValues: new { @contractorId = Model.Id, isInCash = Model.IsInCahs }, htmlAttributes: new { @class = "btn btn-primary" })
-    </div>
+            <div style="margin-bottom: 10px;">
+                @Html.ActionLink("Добавить этап", "CreateStage", "Stages", routeValues: new { @contractorId = Model.Id, isInCash = Model.IsInCahs }, htmlAttributes: new { @class = "btn btn-primary" })
+            </div>
+            <div style="margin-bottom: 10px;">
+                @Html.ActionLink("Печать", "PrintPage", "Stages", routeValues: new { @contractorId = Model.Id, isInCash = Model.IsInCahs }, htmlAttributes: new { @class = "btn btn-primary", @target="_blank" })
+            </div>
         }
     </div>
 

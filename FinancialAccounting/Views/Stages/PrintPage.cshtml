@@ -1,0 +1,119 @@
+﻿@model FinancialAccounting.Models.Contractors.ContractorViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    label, input {
+        display: block;
+    }
+
+        input.text {
+            margin-bottom: 12px;
+            width: 95%;
+            padding: .4em;
+        }
+
+    fieldset {
+        padding: 0;
+        border: 0;
+        margin-top: 25px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+        margin: .6em 0;
+    }
+
+
+    .ui-dialog .ui-state-error {
+        padding: .3em;
+    }
+
+
+    fieldset {
+        border: 0;
+    }
+
+    label {
+        display: block;
+        margin: 30px 0 0 0;
+    }
+
+    .overflow {
+        height: 200px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 style="text-align:left;float:left; padding-left: 10px;">@string.Format("{0}", Model.Name)</h2>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="text-align:left;">@ViewBag.LastUpdate</h3>
+    </div>
+
+    <div class="col-md-12">
+        @Html.DisplayFor(m => m.Description)
+    </div>
+    <hr style="clear:both;" />
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table>
+            <tr>
+                <th style="text-align: center;">Сумма по договору</th>
+                <th style="text-align: center;">Оплачено по договору</th>
+                <th style="text-align: center;">Осталось оплатить</th>
+            </tr>
+            <tr>
+                <td style="text-align: center;">@Model.PaymentsSummary.SummByContract</td>
+                <td style="text-align: center;">@Model.PaymentsSummary.PayedByContract</td>
+                <td style="text-align: center;">@Model.PaymentsSummary.NeedToPayByContract</td>
+            </tr>
+        </table>
+        <hr style="clear:both;" />
+    </div>
+</div>
+
+@if (Model.Stages.Any())
+{
+    <div class="row">
+        <div class="col-md-12">
+            <table>
+                <tr style="border-top: 2px solid black; border-bottom: 2px solid black; ">
+                    <th style="text-align: center; width: 40%; border-right: 2px solid black;">Наименование работ</th>
+                    <th style="text-align: center; width: 10%; border-right: 2px solid black;">Дата выполнения работ по договору</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Стоимость работ</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Аванс</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Дата аванса</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Окончательный платеж</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Дата окончательного платежа</th>
+                    <th style="text-align: center; border-right: 2px solid black;">Оплачено</th>
+                </tr>
+                @foreach (var stage in Model.Stages)
+                {
+                    <tr style="border-bottom: 2px solid black; padding-bottom: 5px;">
+                        <td style="text-align: center; width: 20%; border-right: 2px solid black;">@stage.Name</td>
+                        <td style="text-align: center; width: 5%; border-right: 2px solid black;">@stage.DateOfEnding</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.SummOfPayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.Prepayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.DateOfPrepayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.FinalPayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.DateOfFinalPayment</td>
+                        <td style="text-align: center; border-right: 2px solid black;">@stage.TotalPayed</td>
+                    </tr>
+                }
+            </table>
+            <hr style="clear:both;" />
+        </div>
+    </div>
+}
+
+

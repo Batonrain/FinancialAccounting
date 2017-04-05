@@ -49,6 +49,33 @@ namespace FinancialAccounting.Controllers
             return View(viewModel);
         }
 
+        public ActionResult PrintPage(int contractorId, bool isInCash)
+        {
+            var contractorInfo = _buildingObjectRepository.GetContractorById(contractorId);
+
+            var stages = _stagesRepository.GetStages(contractorId, isInCash);
+
+            var viewModel = new ContractorViewModel
+            {
+                BuildingObjectId = contractorInfo.BuildingObjectId,
+                Description = contractorInfo.Description,
+                Id = contractorInfo.Id,
+                Name = contractorInfo.Name,
+                IsInCahs = isInCash,
+                TypeText = isInCash ? "Наличная оплата" : "Безналичная оплата",
+                Stages = stages.Select(StagesToStageViewModel).OrderBy(s => s.Name).ToList(),
+                PaymentsSummary = GetSummaryPayments(stages)
+            };
+
+            if (stages.Count != 0)
+            {
+                viewModel.ActualisationDate = stages.Max(s => s.DateOfActualisation);
+                viewModel.ActualisationPerson = stages.OrderByDescending(s => s.DateOfActualisation).FirstOrDefault().ActualizedBy;
+            }
+
+            return View(viewModel);
+        }
+
         public ActionResult CreateStage(int contractorId, bool isInCash)
         {
             var types = new List<KeyValuePair<bool, string>>
