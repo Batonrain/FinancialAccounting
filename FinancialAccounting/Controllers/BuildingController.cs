@@ -29,6 +29,7 @@ namespace FinancialAccounting.Controllers
             if (id != 0)
             {
                 var model = new ManageBuildingViewModel();
+                model.Id = id;
                 var buildingObject = _buildingObjectRepository.GetObjectById(id);
 
                 var contractorsId = _contractorsRepository.GetAllContractorsForBuilding(id).Select(s => s.Id);
@@ -44,8 +45,52 @@ namespace FinancialAccounting.Controllers
                 if (model.Contractors.Count != 0)
                 {
                     model.ActualizationDate = model.Contractors.Max(c => c.ActualisationDate).ToString("d");
+                    var bdActualPerson =
+                        model.Contractors.OrderByDescending(c => c.ActualisationDate)
+                            .FirstOrDefault()
+                            .ActualisationPerson;
                     model.ActualizationPerson =
-                        model.Contractors.OrderByDescending(c => c.ActualisationDate).FirstOrDefault().ActualisationPerson;
+                        string.IsNullOrEmpty(bdActualPerson) ? "Superuser" : bdActualPerson;
+
+                    model.TotalPayment = GetTotalSummByContract(contractorsId);
+                }
+                else
+                {
+                    model.TotalPayment = new TotalPaymentViewModel();
+                }
+
+                return View(model);
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult PrintIndex(int id)
+        {
+            if (id != 0)
+            {
+                var model = new ManageBuildingViewModel();
+                var buildingObject = _buildingObjectRepository.GetObjectById(id);
+
+                var contractorsId = _contractorsRepository.GetAllContractorsForBuilding(id).Select(s => s.Id);
+
+                model.BuildingMainInfo = ToBuildingViewModel(buildingObject);
+                model.Contractors = new List<ContractorViewModel>();
+
+                foreach (var contractorId in contractorsId)
+                {
+                    model.Contractors.Add(GetContractorData(contractorId));
+                }
+
+                if (model.Contractors.Count != 0)
+                {
+                    model.ActualizationDate = model.Contractors.Max(c => c.ActualisationDate).ToString("d");
+                    var bdActualPerson =
+                        model.Contractors.OrderByDescending(c => c.ActualisationDate)
+                            .FirstOrDefault()
+                            .ActualisationPerson;
+                    model.ActualizationPerson =
+                        string.IsNullOrEmpty(bdActualPerson) ? "Superuser" : bdActualPerson;
                     model.TotalPayment = GetTotalSummByContract(contractorsId);
                 }
                 else

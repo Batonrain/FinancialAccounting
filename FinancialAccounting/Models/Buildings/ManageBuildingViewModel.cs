@@ -6,6 +6,7 @@ namespace FinancialAccounting.Models.Buildings
 {
     public class ManageBuildingViewModel
     {
+        public int Id { get; set; }
         public BuildingViewModel BuildingMainInfo { get; set; }
         public List<ContractorViewModel> Contractors { get; set; }
 

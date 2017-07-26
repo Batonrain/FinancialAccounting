@@ -28,12 +28,31 @@
     <hr style="clear:both;" />
 </div>
 <div class="row">
-    <div class="col-md-12">
-        Дата актуализации: @Model.ActualizationDate
+    @*<div class="col-md-12">
+            Дата актуализации: @Model.ActualizationDate
+        </div>
+        <div class="col-md-12">
+            Актуализировал: @Model.ActualizationPerson
+        </div>*@
+
+    <div style="float: left; min-height: 100px;">
+        <div style="margin-bottom: 10px;">
+            Дата актуализации: @Model.ActualizationDate
+        </div>
+        <div style="margin-bottom: 10px;">
+            Актуализировано: @Model.ActualizationPerson
+        </div>
     </div>
-    <div class="col-md-12">
-        Актуализировал: @Model.ActualizationPerson
+    <div style="float: right; min-height: 100px;">
+        @if (User.IsInRole("Admin") || User.IsInRole("CashAccounting") || User.IsInRole("NonCashAccounting"))
+        {
+            <div style="margin-bottom: 10px;">
+                @Html.ActionLink("Печать", "PrintIndex", "Building", routeValues: new { @id = Model.BuildingMainInfo.Id }, htmlAttributes: new { @class = "btn btn-primary", @target = "_blank" })
+            </div>
+        }
     </div>
+
+
     <hr style="clear:both;" />
 </div>
 

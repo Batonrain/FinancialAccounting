@@ -281,6 +281,7 @@
     <Content Include="Views\Stages\CreateStage.cshtml" />
     <Content Include="Views\Stages\UpdateStage.cshtml" />
     <Content Include="Views\Stages\PrintPage.cshtml" />
+    <Content Include="Views\Building\PrintIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

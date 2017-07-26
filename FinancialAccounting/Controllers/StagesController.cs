@@ -134,6 +134,7 @@ namespace FinancialAccounting.Controllers
             if (ModelState.IsValid)
             {
                 var stageToAdd = CreateStageViewModelToStageUpdate(updateStageViewModel);
+                stageToAdd.ActualizedBy = User.Identity.Name;
 
                 _stagesRepository.UpdateStage(stageToAdd);
 
@@ -174,7 +175,7 @@ namespace FinancialAccounting.Controllers
                 {
                     currentStage.PrepaymentPayed = currentStage.PrepaymentPayed + Convert.ToDecimal(model.PaymentSum);
                 }
-
+                currentStage.ActualizedBy = User.Identity.Name;
                 _stagesRepository.UpdateStagePayment(currentStage);
 
                 return Json("Success");
@@ -234,7 +235,7 @@ namespace FinancialAccounting.Controllers
                 return Status.Red;
             }
 
-            return Status.White;
+            return Status.Green;
         }
 
         private StageViewModel StagesToStageViewModel(Stage stage)
