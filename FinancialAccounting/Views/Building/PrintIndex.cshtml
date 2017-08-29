@@ -54,7 +54,7 @@
                     </table>
                 </td>
             </tr>
-            @foreach (var contractor in @Model.Contractors)
+            @foreach (var contractor in @Model.Contractors.OrderBy(contractor => contractor.Name))
             {
                 <tr style="border-collapse: separate; border-spacing: 0 5px; border-bottom: 2px solid black;">
                     <td style="text-align:center;">

@@ -36,11 +36,12 @@ namespace FinancialAccounting.Controllers
 
                 model.BuildingMainInfo = ToBuildingViewModel(buildingObject);
                 model.Contractors = new List<ContractorViewModel>();
-
+                var contractors = new List<ContractorViewModel>();
                 foreach (var contractorId in contractorsId)
                 {
                     model.Contractors.Add(GetContractorData(contractorId));
                 }
+
 
                 if (model.Contractors.Count != 0)
                 {
